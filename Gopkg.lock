@@ -119,6 +119,14 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
+  digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
+  name = "github.com/inconshreveable/mousetrap"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
+  version = "v1.0"
+
+[[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -250,6 +258,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
+  name = "github.com/spf13/cobra"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
+  version = "v0.0.3"
+
+[[projects]]
   branch = "master"
   digest = "1:080e5f630945ad754f4b920e60b4d3095ba0237ebf88dc462eb28002932e3805"
   name = "github.com/spf13/jwalterweatherman"
@@ -274,7 +290,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:2bcf9e6a085e9d3c67d22ca0443478a8a48814b8dd0f658753886cadb853323f"
+  digest = "1:46d0110c781f2c9b0945e0506b0903a5a25d48fcdd854f92fdc5f660ba0a6738"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -286,8 +302,6 @@
     "constants",
     "context",
     "errors",
-    "examples/demo/cluster/services",
-    "examples/demo/protos",
     "interfaces",
     "internal/codec",
     "internal/message",
@@ -428,10 +442,8 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gorilla/mux",
+    "github.com/spf13/cobra",
     "github.com/topfreegames/pitaya",
-    "github.com/topfreegames/pitaya/acceptor",
-    "github.com/topfreegames/pitaya/component",
-    "github.com/topfreegames/pitaya/examples/demo/cluster/services",
     "github.com/topfreegames/pitaya/serialize/json",
   ]
   solver-name = "gps-cdcl"
