@@ -4,29 +4,51 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/gorilla/mux"
 )
 
 // App struct
 type App struct {
-	Router *mux.Router
-	host   string
-	port   int
+	Address string
+	Router  *mux.Router
+	Server  *http.Server
+	Logger  logrus.FieldLogger
+}
+
+// NewApp constructor
+func NewApp(
+	host string,
+	port int,
+) (*App, error) {
+	a := &App{
+		Address: fmt.Sprintf("%s:%d", host, port),
+	}
+	a.configureApp()
+	return a, nil
+}
+
+func (a *App) configureApp() {
+	a.Router = a.getRouter()
+	a.configureServer()
+}
+
+func (a *App) configureServer() {
+	a.Server = &http.Server{
+		Addr:    a.Address,
+		Handler: a.Router,
+	}
 }
 
 func (a *App) getRouter() *mux.Router {
 	router := mux.NewRouter()
-	router.Handle("/servers/{type}", NewServersHandler(a)).Methods("GET")
+	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
 	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
 	return router
 }
 
-// Init starts the api
-func Init() {
-	api := &App{
-		host: "localhost",
-		port: 8000,
-	}
-	api.Router = api.getRouter()
-	http.ListenAndServe(fmt.Sprintf("%s:%d", api.host, api.port), api.Router)
+// Init starts the app
+func (a *App) Init() {
+	go a.Server.ListenAndServe()
 }

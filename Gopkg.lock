@@ -290,7 +290,8 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:46d0110c781f2c9b0945e0506b0903a5a25d48fcdd854f92fdc5f660ba0a6738"
+  branch = "master"
+  digest = "1:72ae437e9cad0a3c76766fe9e25e19202e3ce36f2a7155945e676be78c4f02cf"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -301,6 +302,7 @@
     "config",
     "constants",
     "context",
+    "docgenerator",
     "errors",
     "interfaces",
     "internal/codec",
@@ -324,8 +326,7 @@
     "util/compression",
   ]
   pruneopts = "UT"
-  revision = "eddbc21a5277ae19fc02c5d02138869a35ffd898"
-  version = "v0.2.1"
+  revision = "4114def3e8d7a63902021b9524a35cc30a80c0a3"
 
 [[projects]]
   branch = "master"
@@ -442,8 +443,10 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gorilla/mux",
+    "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
     "github.com/topfreegames/pitaya",
+    "github.com/topfreegames/pitaya/cluster",
     "github.com/topfreegames/pitaya/serialize/json",
   ]
   solver-name = "gps-cdcl"

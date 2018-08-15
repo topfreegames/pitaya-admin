@@ -3,7 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
+
+	"github.com/topfreegames/pitaya/cluster"
 
 	"github.com/topfreegames/pitaya"
 )
@@ -21,21 +22,41 @@ func NewServersHandler(a *App) *ServersHandler {
 
 // ServeHTTP method
 func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	param := strings.Replace(r.URL.Path, "/servers/", "", -1)
-	serversMap, err := pitaya.GetServersByType(param)
+	v := r.URL.Query()
+	param := v.Get("type")
 
-	if err != nil {
-		w.Write([]byte("error: failed to retrieve servers by type"))
+	if param == "" {
+		serversMap := pitaya.GetServers()
+
+		servers, err := json.Marshal(serversMap)
+
+		if err != nil {
+			Write(w, 500, `{"success":false, "message":"failed to marshal response"}`)
+			return
+		}
+
+		w.Write(servers)
+
 		return
 	}
 
-	for _, server := range serversMap {
-		serverJSON, err := json.Marshal(server)
-		if err == nil {
-			w.Write(serverJSON)
-			continue
-		}
-		w.Write([]byte("error: failed to retrieve server details"))
+	serversMap, err := pitaya.GetServersByType(param)
+	if err != nil {
+		Write(w, 500, `{"success":false, "message":"failed to retrieve servers"}`)
+		return
 	}
 
+	arr := make([]*cluster.Server, 0)
+	for _, server := range serversMap {
+		arr = append(arr, server)
+	}
+
+	servers, err := json.Marshal(arr)
+
+	if err != nil {
+		Write(w, 500, `{"success":false, "message":"failed to marshal response"}`)
+		return
+	}
+
+	w.Write(servers)
 }
