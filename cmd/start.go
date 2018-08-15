@@ -3,15 +3,20 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/api"
+	"github.com/topfreegames/pitaya/cluster"
+	"github.com/topfreegames/pitaya/modules"
 	"github.com/topfreegames/pitaya/serialize/json"
 )
 
-var isFrontend bool
-var svType string
 var bind string
+var isFrontend bool
 var port int
+var rpcServerPort string // WIP: this probably isn't the way to go
+var svType string
+var usesGrpc bool // Also this doesn't quite feel right
 
 var startCmd = &cobra.Command{
 	Use:   "start",
@@ -38,12 +43,49 @@ var startCmd = &cobra.Command{
 		app.Init()
 
 		pitaya.SetSerializer(json.NewSerializer())
-		pitaya.Configure(isFrontend, svType, pitaya.Cluster, map[string]string{})
+
+		if usesGrpc {
+			// This setup GRPC server and was based on the grpc example, probably there is a lot to tweak. Specially the part about viper
+			if rpcServerPort == "" {
+				cmdL.Fatal("cant use grpc without a port, specify with -r")
+			}
+
+			meta := map[string]string{
+				"grpc-host": "0.0.0.0",
+				"grpc-port": rpcServerPort,
+			}
+
+			confs := viper.New()
+			confs.Set("pitaya.cluster.rpc.server.grpc.port", rpcServerPort)
+
+			pitaya.Configure(isFrontend, svType, pitaya.Cluster, meta, confs)
+
+			bs := modules.NewETCDBindingStorage(pitaya.GetServer(), pitaya.GetConfig())
+			pitaya.RegisterModule(bs, "bindingsStorage")
+
+			gs, err := cluster.NewGRPCServer(pitaya.GetConfig(), pitaya.GetServer(), pitaya.GetMetricsReporters())
+			if err != nil {
+				cmdL.Fatal(err)
+			}
+
+			gc, err := cluster.NewGRPCClient(pitaya.GetConfig(), pitaya.GetServer(), pitaya.GetMetricsReporters(), bs)
+			if err != nil {
+				cmdL.Fatal(err)
+			}
+			pitaya.SetRPCServer(gs)
+			pitaya.SetRPCClient(gc)
+
+		} else {
+			pitaya.Configure(isFrontend, svType, pitaya.Cluster, map[string]string{})
+		}
+
 		pitaya.Start()
 	},
 }
 
 func init() {
+	startCmd.Flags().BoolVarP(&usesGrpc, "usesGrpc", "g", false, "if server uses or not grpc")
+	startCmd.Flags().StringVarP(&rpcServerPort, "rpcServerPort", "r", "", "the port that grpc server will listen")
 	startCmd.Flags().BoolVar(&isFrontend, "isFrontend", false, "if server is frontend")
 	startCmd.Flags().StringVar(&svType, "type", "admin", "the server type")
 	startCmd.Flags().StringVarP(&bind, "bind", "b", "0.0.0.0", "bind address")
