@@ -11,19 +11,22 @@ import (
 
 // App struct
 type App struct {
-	Address string
-	Router  *mux.Router
-	Server  *http.Server
-	Logger  logrus.FieldLogger
+	Address  string
+	Router   *mux.Router
+	Server   *http.Server
+	Logger   logrus.FieldLogger
+	usesGrpc bool
 }
 
 // NewApp constructor
 func NewApp(
 	host string,
 	port int,
+	usesGrpc bool,
 ) (*App, error) {
 	a := &App{
-		Address: fmt.Sprintf("%s:%d", host, port),
+		Address:  fmt.Sprintf("%s:%d", host, port),
+		usesGrpc: usesGrpc,
 	}
 	a.configureApp()
 	return a, nil
@@ -45,6 +48,7 @@ func (a *App) getRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
 	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
+	router.Handle("/user/kick", NewKickUserHandler(a)).Methods("POST")
 	return router
 }
 

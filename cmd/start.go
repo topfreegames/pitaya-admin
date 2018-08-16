@@ -14,9 +14,9 @@ import (
 var bind string
 var isFrontend bool
 var port int
-var rpcServerPort string // WIP: this probably isn't the way to go
+var rpcServerPort string
 var svType string
-var usesGrpc bool // Also this doesn't quite feel right
+var usesGrpc bool
 
 var startCmd = &cobra.Command{
 	Use:   "start",
@@ -33,7 +33,7 @@ var startCmd = &cobra.Command{
 		})
 
 		cmdL.Info("starting pitaya admin")
-		app, err := api.NewApp(bind, port)
+		app, err := api.NewApp(bind, port, usesGrpc)
 
 		if err != nil {
 			cmdL.Fatal(err)
@@ -45,7 +45,6 @@ var startCmd = &cobra.Command{
 		pitaya.SetSerializer(json.NewSerializer())
 
 		if usesGrpc {
-			// This setup GRPC server and was based on the grpc example, probably there is a lot to tweak. Specially the part about viper
 			if rpcServerPort == "" {
 				cmdL.Fatal("cant use grpc without a port, specify with -r")
 			}
