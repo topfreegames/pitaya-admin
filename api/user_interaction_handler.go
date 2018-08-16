@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/topfreegames/pitaya"
-	"github.com/topfreegames/pitaya/modules"
-	"github.com/topfreegames/pitaya/protos"
 )
 
 type pushMsg struct {
@@ -49,7 +47,7 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type kickMsg struct {
-	Uid          string
+	Uids         []string
 	FrontendType string
 }
 
@@ -73,34 +71,13 @@ func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if s.App.usesGrpc {
-		bs, err := pitaya.GetModule("bindingsStorage")
-		if err != nil {
-			Write(w, 500, `{"success":false, "message":"binding storage must be set when using grpc"}`)
-			return
-		}
+	err = pitaya.SendKickToUsers(kick.Uids, kick.FrontendType)
 
-		bindingStorage, ok := bs.(*modules.ETCDBindingStorage)
-		if !ok {
-			Write(w, 500, `{"success":false, "message":"binding storage must be set when using grpc"}`)
-			return
-		}
-
-		svID, err := bindingStorage.GetUserFrontendID(kick.Uid, kick.FrontendType)
-		if err != nil {
-			Write(w, 500, `{"success":false, "message":"error trying to get user frontend server id"}`)
-			return
-		}
-
-		rpcRoute := kick.FrontendType + ".sys.kick"
-		err = pitaya.RPCTo(r.Context(), svID, rpcRoute, &protos.KickAnswer{}, &protos.KickMsg{UserId: kick.Uid})
-		if err != nil {
-			Write(w, 500, `{"success":false, "message":"failed to send kick rpc"}`)
-		}
-
-		Write(w, http.StatusOK, `{"success":true, "message":"user kicked"}`)
+	if err != nil {
+		Write(w, 500, `{"success":false, "message":"failed to kick user from server"}`)
 		return
 	}
 
-	Write(w, 500, `{"success":false, "message":"non-grpc kick not implemented yet"}`)
+	Write(w, http.StatusOK, `{"success":true}`)
+
 }

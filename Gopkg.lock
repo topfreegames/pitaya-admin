@@ -445,8 +445,11 @@
     "github.com/gorilla/mux",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
+    "github.com/spf13/viper",
     "github.com/topfreegames/pitaya",
     "github.com/topfreegames/pitaya/cluster",
+    "github.com/topfreegames/pitaya/modules",
+    "github.com/topfreegames/pitaya/protos",
     "github.com/topfreegames/pitaya/serialize/json",
   ]
   solver-name = "gps-cdcl"
