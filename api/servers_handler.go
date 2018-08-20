@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/topfreegames/pitaya/cluster"
+	"github.com/topfreegames/pitaya/logger"
 
 	"github.com/topfreegames/pitaya"
 )
@@ -31,7 +33,9 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		servers, err := json.Marshal(serversMap)
 
 		if err != nil {
-			Write(w, 500, `{"success":false, "message":"failed to marshal response"}`)
+			logger.Log.Errorf("error trying to marshal servers map: %s", err.Error())
+			errMsg := fmt.Sprintf(`{"success":false, "message":"failed to marshal response", "reason": "%s"}`, err.Error())
+			Write(w, 500, errMsg)
 			return
 		}
 
@@ -42,7 +46,9 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	serversMap, err := pitaya.GetServersByType(param)
 	if err != nil {
-		Write(w, 500, `{"success":false, "message":"failed to retrieve servers"}`)
+		logger.Log.Errorf("error trying to retrieve servers: %s", err.Error())
+		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to retrieve servers", "reason": "%s"}`, err.Error())
+		Write(w, 500, errMsg)
 		return
 	}
 
@@ -54,7 +60,9 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	servers, err := json.Marshal(arr)
 
 	if err != nil {
-		Write(w, 500, `{"success":false, "message":"failed to marshal response"}`)
+		logger.Log.Errorf("error trying to marshal servers array: %s", err.Error())
+		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to marshal response", "reason": "%s"}`, err.Error())
+		Write(w, 500, errMsg)
 		return
 	}
 
