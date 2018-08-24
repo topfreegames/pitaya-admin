@@ -49,6 +49,7 @@ func (a *App) getRouter() *mux.Router {
 	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
 	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
 	router.Handle("/user/kick", NewKickUserHandler(a)).Methods("POST")
+	router.Handle("/rpc", NewRPCHandler(a)).Methods("POST")
 	return router
 }
 
