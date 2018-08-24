@@ -29,7 +29,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if param != "" {
 		rs := &protos.Doc{}
-		route := param + "." + param + "remote.docs"
+		route := param + "." + param + "remote.docs" // this should be set default for servers which want this feature
 		err := pitaya.RPC(context.Background(), route, rs, &protos.Doc{})
 
 		if err != nil {
