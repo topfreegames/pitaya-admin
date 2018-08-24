@@ -28,14 +28,14 @@ func WriteBytes(w http.ResponseWriter, status int, text []byte) {
 
 // WriteError to response with msg and logger
 func WriteError(w http.ResponseWriter, status int, errorMsg string, err error) {
-	logger.Log.Errorf("error %s: %s", errorMsg, err.Error())
+	logger.Log.Errorf("error %s, %s", errorMsg, err.Error())
 	errMsg := fmt.Sprintf(`{"success":false, "message":"%s", "reason": "%s"}`, errorMsg, err.Error())
 	Write(w, http.StatusBadRequest, errMsg)
 }
 
 // WriteSuccessWithJSON sends response with statusOK to request
-func WriteSuccessWithJSON(w http.ResponseWriter, status int, res []byte) {
+func WriteSuccessWithJSON(w http.ResponseWriter, status int, res []byte, msg string) {
 	retMsg := fmt.Sprintf(`{"success" : true, "response":%s}`, res)
-	logger.Log.Info("Sucessfully sent RPC")
+	logger.Log.Info(msg)
 	Write(w, http.StatusOK, retMsg)
 }

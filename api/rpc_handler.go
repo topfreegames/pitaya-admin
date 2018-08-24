@@ -83,5 +83,5 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteSuccessWithJSON(w, http.StatusOK, jsonResponse)
+	WriteSuccessWithJSON(w, http.StatusOK, jsonResponse, "Successfully sent RPC")
 }
