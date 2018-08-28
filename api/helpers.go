@@ -33,7 +33,7 @@ func WriteError(w http.ResponseWriter, status int, errorMsg string, err error) {
 	Write(w, http.StatusBadRequest, errMsg)
 }
 
-// WriteSuccessWithJSON sends response with statusOK to request
+// WriteSuccessWithJSON sends response with statusOK to request and log success msg
 func WriteSuccessWithJSON(w http.ResponseWriter, status int, res []byte, msg string) {
 	retMsg := fmt.Sprintf(`{"success" : true, "response":%s}`, res)
 	logger.Log.Info(msg)

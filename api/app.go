@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
+	"github.com/topfreegames/pitaya-admin/config"
 )
 
 // App struct
@@ -16,6 +17,7 @@ type App struct {
 	Server   *http.Server
 	Logger   logrus.FieldLogger
 	usesGrpc bool
+	Config   *config.Config
 }
 
 // NewApp constructor
@@ -23,9 +25,11 @@ func NewApp(
 	host string,
 	port int,
 	usesGrpc bool,
+	config *config.Config,
 ) (*App, error) {
 	a := &App{
 		Address:  fmt.Sprintf("%s:%d", host, port),
+		Config:   config,
 		usesGrpc: usesGrpc,
 	}
 	a.configureApp()

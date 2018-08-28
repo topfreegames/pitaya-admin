@@ -1,26 +1,32 @@
 package api
 
 import (
-	"context"
-	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/topfreegames/pitaya"
-	"github.com/topfreegames/pitaya-admin/protos"
+
+	"github.com/topfreegames/pitaya-admin/usecases"
+
+	"github.com/topfreegames/pitaya-admin/constants"
 )
 
 // DocsHandler handle docs
 type DocsHandler struct {
-	App *App
+	App             *App
+	docsRemoteRoute string
 }
 
 // NewDocsHandler create new docs handler
 func NewDocsHandler(a *App) *DocsHandler {
-	m := &DocsHandler{App: a}
+	m := &DocsHandler{
+		App:             a,
+		docsRemoteRoute: a.Config.GetString("pitayaadmin.docs.suffix"),
+	}
 	return m
 }
 
+// ServeHTTP method. Docs will only work if game has a remote for docs
 func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 	param := v.Get("type")
@@ -28,45 +34,37 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	routeParam := v.Get("route")
 
 	if param != "" {
-		rs := &protos.Doc{}
-		route := param + "." + param + "remote.docs" // this should be a default suffix
-		err := pitaya.RPC(context.Background(), route, rs, &protos.Doc{})
-
-		if err != nil {
-			WriteError(w, 500, "failed to send RPC, server must have remote service docs", err)
-			return
-		}
-
 		if roh != "" {
-			var ret map[string]interface{}
-			err := json.Unmarshal([]byte(rs.GetDoc()), &ret)
-			if err != nil {
-				WriteError(w, 500, "failed to unmarshal documentation", err)
-				return
-			}
-			rM := ret[roh]
-			retMap, _ := rM.(map[string]interface{})
 			if routeParam != "" {
-				retMapBytes, err := json.Marshal(retMap[routeParam])
+				ret, err := usecases.GetMethodDoc(param, roh, routeParam)
 				if err != nil {
-					WriteError(w, 500, "failed to marshal documentation", err)
+					WriteError(w, 500, "failed to get doc by route", err)
 					return
 				}
-				WriteSuccessWithJSON(w, http.StatusOK, retMapBytes, "Successfully got docs")
+				bts, _ := pitaya.GetSerializer().Marshal(ret)
+				Write(w, 200, string(bts))
 				return
 			}
-			retMapBytes, err := json.Marshal(rM)
-			if err != nil {
-				WriteError(w, 500, "failed to marshal documentation", err)
-				return
-			}
-			WriteSuccessWithJSON(w, http.StatusOK, retMapBytes, "Successfully got docs")
-			return
 
+			ret, err := usecases.GetDocForHandlersOrRemotes(param, roh)
+			if err != nil {
+				errMsg := fmt.Sprintf("failed to get docs %s", roh)
+				WriteError(w, 500, errMsg, err)
+				return
+			}
+			bts, _ := pitaya.GetSerializer().Marshal(ret)
+			Write(w, 200, string(bts))
+			return
 		}
-		WriteSuccessWithJSON(w, http.StatusOK, []byte(rs.GetDoc()), "Successfully got docs")
+		ret, err := usecases.GetDocumentationForServerType(param)
+		if err != nil {
+			WriteError(w, 500, "failed to get docs", err)
+			return
+		}
+		bts, _ := pitaya.GetSerializer().Marshal(ret)
+		Write(w, 200, string(bts))
 		return
 	}
 
-	WriteError(w, http.StatusBadRequest, "must specify at least server type", errors.New("server type not specified"))
+	WriteError(w, http.StatusBadRequest, "must specify at least server type", constants.ErrNoServerType)
 }
