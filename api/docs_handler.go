@@ -29,7 +29,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if param != "" {
 		rs := &protos.Doc{}
-		route := param + "." + param + "remote.docs" // this should be set default for servers which want this feature
+		route := param + "." + param + "remote.docs" // this should be a default suffix
 		err := pitaya.RPC(context.Background(), route, rs, &protos.Doc{})
 
 		if err != nil {
@@ -39,7 +39,11 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if roh != "" {
 			var ret map[string]interface{}
-			json.Unmarshal([]byte(rs.GetDoc()), &ret)
+			err := json.Unmarshal([]byte(rs.GetDoc()), &ret)
+			if err != nil {
+				WriteError(w, 500, "failed to unmarshal documentation", err)
+				return
+			}
 			rM := ret[roh]
 			retMap, _ := rM.(map[string]interface{})
 			if routeParam != "" {

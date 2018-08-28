@@ -46,11 +46,12 @@ func (a *App) configureServer() {
 
 func (a *App) getRouter() *mux.Router {
 	router := mux.NewRouter()
-	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
-	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
-	router.Handle("/user/kick", NewKickUserHandler(a)).Methods("POST")
-	router.Handle("/rpc", NewRPCHandler(a)).Methods("POST")
 	router.Handle("/docs", NewDocsHandler(a)).Methods("GET")
+	router.Handle("/request", NewRequestHandler(a)).Methods("GET")
+	router.Handle("/rpc", NewRPCHandler(a)).Methods("POST")
+	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
+	router.Handle("/user/kick", NewKickUserHandler(a)).Methods("POST")
+	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
 	return router
 }
 
