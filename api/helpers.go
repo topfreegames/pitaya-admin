@@ -26,11 +26,11 @@ func WriteBytes(w http.ResponseWriter, status int, text []byte) {
 	w.Write(text)
 }
 
-// WriteError to response with msg and logger
+// WriteError to the response with message and log error message
 func WriteError(w http.ResponseWriter, status int, errorMsg string, err error) {
 	logger.Log.Errorf("error %s, %s", errorMsg, err.Error())
 	errMsg := fmt.Sprintf(`{"success":false, "message":"%s", "reason": "%s"}`, errorMsg, err.Error())
-	Write(w, http.StatusBadRequest, errMsg)
+	Write(w, status, errMsg)
 }
 
 // WriteSuccessWithJSON sends response with statusOK to request and log success msg

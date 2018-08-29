@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/api"
-	"github.com/topfreegames/pitaya-admin/config"
 	"github.com/topfreegames/pitaya/cluster"
 	"github.com/topfreegames/pitaya/modules"
 	"github.com/topfreegames/pitaya/serialize/json"
@@ -36,8 +35,9 @@ var startCmd = &cobra.Command{
 		})
 
 		cmdL.Info("starting pitaya admin")
-		conf := config.NewConfig()
-		app, err := api.NewApp(bind, port, usesGrpc, conf)
+		conf := viper.New()
+
+		app, err := api.NewApp(bind, port, conf)
 
 		if err != nil {
 			cmdL.Fatal(err)

@@ -1,18 +1,19 @@
-package usecases
+package request
 
 import (
-	"github.com/gorilla/websocket"
 	"github.com/topfreegames/pitaya/client"
 )
 
-// RequestMsg ...
+// RequestMsg struct represents the message that the server will receive
 type RequestMsg struct {
 	Route     string
 	Payload   []byte
 	IsRequest bool
 }
 
-// ProcessMessage ...
+type clientMessageForwarder func(m interface{}) error
+
+// ProcessMessage process received messages and send them to pitaya
 func ProcessMessage(msg RequestMsg, pClient *client.Client) error {
 	var err error
 	if msg.IsRequest {
@@ -20,19 +21,16 @@ func ProcessMessage(msg RequestMsg, pClient *client.Client) error {
 	} else {
 		err = pClient.SendNotify(msg.Route, msg.Payload)
 	}
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
-// ListenForClientMessages ...
-func ListenForClientMessages(pClient *client.Client, ws *websocket.Conn) {
+// ListenForClientMessages receives messages that were sent to the client and write it to the websocket
+func ListenForClientMessages(pClient *client.Client, processMessage clientMessageForwarder) {
 	for {
 		select {
 		case m := <-pClient.IncomingMsgChan:
-			err := ws.WriteMessage(websocket.TextMessage, m.Data)
+			err := processMessage(m)
 			if err != nil {
 				return
 			}

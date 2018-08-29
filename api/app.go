@@ -5,38 +5,37 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/gorilla/mux"
-	"github.com/topfreegames/pitaya-admin/config"
 )
 
 // App struct
 type App struct {
-	Address  string
-	Router   *mux.Router
-	Server   *http.Server
-	Logger   logrus.FieldLogger
-	usesGrpc bool
-	Config   *config.Config
+	Address string
+	Router  *mux.Router
+	Server  *http.Server
+	Logger  logrus.FieldLogger
+	Config  *viper.Viper
 }
 
 // NewApp constructor
 func NewApp(
 	host string,
 	port int,
-	usesGrpc bool,
-	config *config.Config,
+	config *viper.Viper,
 ) (*App, error) {
 	a := &App{
-		Address:  fmt.Sprintf("%s:%d", host, port),
-		Config:   config,
-		usesGrpc: usesGrpc,
+		Address: fmt.Sprintf("%s:%d", host, port),
+		Config:  config,
 	}
 	a.configureApp()
 	return a, nil
 }
 
 func (a *App) configureApp() {
+	a.Config.SetDefault("pitayaadmin.request.readdeadline", "15s")
+	a.Config.SetDefault("pitayaadmin.docs.suffix", "remote.docs")
 	a.Router = a.getRouter()
 	a.configureServer()
 }
@@ -62,4 +61,9 @@ func (a *App) getRouter() *mux.Router {
 // Init starts the app
 func (a *App) Init() {
 	go a.Server.ListenAndServe()
+}
+
+// GetRemoteDocsRoute gets the route for the autodoc handler
+func (a *App) GetRemoteDocsRoute() string {
+	return a.Config.GetString("pitayaadmin.docs.suffix")
 }

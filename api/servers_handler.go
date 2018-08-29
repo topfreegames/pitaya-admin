@@ -9,7 +9,7 @@ import (
 	"github.com/topfreegames/pitaya"
 )
 
-// ServersHandler handler
+// ServersHandler handle list server routes
 type ServersHandler struct {
 	App *App
 }
@@ -31,7 +31,7 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		servers, err := json.Marshal(serversMap)
 
 		if err != nil {
-			WriteError(w, 500, "failed trying to marshal servers map", err)
+			WriteError(w, http.StatusInternalServerError, "failed trying to marshal servers map", err)
 			return
 		}
 
@@ -41,7 +41,7 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	serversMap, err := pitaya.GetServersByType(param)
 	if err != nil {
-		WriteError(w, 500, "failed to retrieve servers", err)
+		WriteError(w, http.StatusInternalServerError, "failed to retrieve servers", err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (s *ServersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	servers, err := json.Marshal(arr)
 
 	if err != nil {
-		WriteError(w, 500, "failed to marshal servers array", err)
+		WriteError(w, http.StatusInternalServerError, "failed to marshal servers array", err)
 		return
 	}
 

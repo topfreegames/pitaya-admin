@@ -1,4 +1,4 @@
-package usecases
+package rpc
 
 import (
 	"bytes"
@@ -9,9 +9,10 @@ import (
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/topfreegames/pitaya-admin/constants"
+	"github.com/topfreegames/pitaya-admin/docs"
 )
 
-// RPCRequest ...
+// RPCRequest represents a request received by the server to be used in RPC
 type RPCRequest struct {
 	Route        string
 	FrontendType string
@@ -20,12 +21,12 @@ type RPCRequest struct {
 	ProtoSource  []byte // This is the proto source file for protos that the method in route will use
 }
 
-func getInputAndOuputProtosFromAutodoc(route, frontendtype string) (string, string, error) {
+func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute string) (string, string, error) {
 
 	outputName := ""
 	inputName := ""
 
-	remoteMethodDocs, err := GetMethodDoc(frontendtype, "remote", route)
+	remoteMethodDocs, err := docs.GetMethodDoc(frontendtype, "remote", route, docsRemoteRoute)
 
 	if err != nil {
 		return "", "", err
@@ -66,10 +67,10 @@ func getInputAndOuputProtosFromAutodoc(route, frontendtype string) (string, stri
 
 }
 
-// CreateRPCMessagesFromProto ...
-func CreateRPCMessagesFromProto(frontendtype, route string, protosource []byte, meta string) (*dynamic.Message, *dynamic.Message, error) {
+// CreateRPCMessagesFromProto outputs the reply and args messages types for a given RPC route using protoparse and dynamic messages
+func CreateRPCMessagesFromProto(frontendtype, route string, protosource []byte, meta, docsRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
 
-	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(route, frontendtype)
+	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute)
 
 	if err != nil {
 		return nil, nil, err

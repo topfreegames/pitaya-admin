@@ -5,12 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/topfreegames/pitaya-admin/usecases"
-
 	"github.com/topfreegames/pitaya"
+	"github.com/topfreegames/pitaya-admin/rpc"
 )
 
-// RPCHandler handler
+// RPCHandler handles RPC routes
 type RPCHandler struct {
 	App *App
 }
@@ -21,20 +20,17 @@ func NewRPCHandler(a *App) *RPCHandler {
 	return m
 }
 
-// RPCRequest struct
-type RPCRequest struct {
-	Route        string
-	FrontendType string
-	ServerID     string
-	Meta         string // Data itself
-	ProtoSource  []byte // This is the proto source file for protos that the method in route will use
-}
-
+// ServeHTTP method
 func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var remote RPCRequest
+	var remote rpc.RPCRequest
 	err := json.NewDecoder(r.Body).Decode(&remote)
 
-	requestMessage, responseMessage, err := usecases.CreateRPCMessagesFromProto(remote.FrontendType, remote.Route, remote.ProtoSource, remote.Meta)
+	if err != nil {
+		WriteError(w, http.StatusBadRequest, "failed to decode request", err)
+		return
+	}
+
+	requestMessage, responseMessage, err := rpc.CreateRPCMessagesFromProto(remote.FrontendType, remote.Route, remote.ProtoSource, remote.Meta, s.App.GetRemoteDocsRoute())
 
 	if err != nil {
 		WriteError(w, http.StatusBadRequest, "failed to create RPC", err)
@@ -48,14 +44,14 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		WriteError(w, 500, "failed to send RPC", err)
+		WriteError(w, http.StatusInternalServerError, "failed to send RPC", err)
 		return
 	}
 
 	jsonResponse, err := responseMessage.MarshalJSON()
 
 	if err != nil {
-		WriteError(w, 500, "failed to marshal response into JSON", err)
+		WriteError(w, http.StatusInternalServerError, "failed to marshal response into JSON", err)
 		return
 	}
 

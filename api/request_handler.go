@@ -1,24 +1,18 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
-	"github.com/topfreegames/pitaya-admin/usecases"
+	"github.com/topfreegames/pitaya-admin/request"
 	"github.com/topfreegames/pitaya/client"
 	"github.com/topfreegames/pitaya/logger"
 )
 
-// RequestMsg struct
-type RequestMsg struct {
-	Route     string
-	Payload   []byte
-	IsRequest bool
-}
-
-// RequestHandler handler
+// RequestHandler handle requests
 type RequestHandler struct {
 	App          *App
 	readDeadLine time.Duration
@@ -43,9 +37,8 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 	pitayaAddress := v.Get("address")
 	ws, err := upgrader.Upgrade(w, r, nil)
-
 	if err != nil {
-		WriteError(w, 500, "failed to establish websocket", err)
+		WriteError(w, http.StatusInternalServerError, "failed to establish websocket", err)
 		return
 	}
 
@@ -58,26 +51,33 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var pClient = client.New(logrus.InfoLevel)
 	err = pClient.ConnectTo(pitayaAddress)
-	defer pClient.Disconnect()
 
 	if err != nil {
-		WriteError(w, 500, "failed to connect to pitaya", err)
+		WriteError(w, http.StatusInternalServerError, "failed to connect to pitaya", err)
 		ws.Close()
 		return
 	}
 
-	// TODO: this should receive a function instead of the websocket itself
-	go usecases.ListenForClientMessages(pClient, ws)
+	defer pClient.Disconnect()
 
-	for { //read requests and notify`s
+	go request.ListenForClientMessages(pClient, func(m interface{}) error {
+		byteMessage, err := json.Marshal(m)
+		if err != nil {
+			return err
+		}
+		ws.WriteMessage(websocket.BinaryMessage, byteMessage)
+		return nil
+	})
+
+	for {
 		select {
 		default:
-			var msg usecases.RequestMsg
+			var msg request.RequestMsg
 			if err := ws.ReadJSON(&msg); err != nil {
-				logger.Log.Warnf("failed to read msg from websocket, closing connection. %s", err.Error())
+				logger.Log.Errorf("failed to read msg from websocket, closing connection. %s", err.Error())
 				return
 			}
-			usecases.ProcessMessage(msg, pClient)
+			request.ProcessMessage(msg, pClient)
 		}
 
 	}

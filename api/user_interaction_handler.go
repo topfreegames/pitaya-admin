@@ -14,7 +14,7 @@ type pushMsg struct {
 	FrontendType string
 }
 
-// PushToUsersHandler handler
+// PushToUsersHandler handle push route
 type PushToUsersHandler struct {
 	App *App
 }
@@ -31,14 +31,14 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&push)
 
 	if err != nil {
-		WriteError(w, 500, "failed to decode request body into push struct", err)
+		WriteError(w, http.StatusInternalServerError, "failed to decode request body into push struct", err)
 		return
 	}
 
 	err = pitaya.SendPushToUsers(push.Route, push.Message, push.Uids, push.FrontendType)
 
 	if err != nil {
-		WriteError(w, 500, "failed to send push to user", err)
+		WriteError(w, http.StatusInternalServerError, "failed to send push to user", err)
 		return
 	}
 
@@ -51,7 +51,7 @@ type kickMsg struct {
 	FrontendType string
 }
 
-// KickUserHandler handler
+// KickUserHandler handle kick route
 type KickUserHandler struct {
 	App *App
 }
@@ -67,14 +67,14 @@ func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&kick)
 
 	if err != nil {
-		WriteError(w, 500, "failed to decode request body into kick struct", err)
+		WriteError(w, http.StatusInternalServerError, "failed to decode request body into kick struct", err)
 		return
 	}
 
 	err = pitaya.SendKickToUsers(kick.Uids, kick.FrontendType)
 
 	if err != nil {
-		WriteError(w, 500, "failed to kick user", err)
+		WriteError(w, http.StatusInternalServerError, "failed to kick user", err)
 		return
 	}
 
