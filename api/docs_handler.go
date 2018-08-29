@@ -12,15 +12,13 @@ import (
 
 // DocsHandler handle documentation routes
 type DocsHandler struct {
-	App             *App
-	docsRemoteRoute string
+	App *App
 }
 
 // NewDocsHandler create new docs handler
 func NewDocsHandler(a *App) *DocsHandler {
 	m := &DocsHandler{
-		App:             a,
-		docsRemoteRoute: a.Config.GetString("pitayaadmin.docs.suffix"),
+		App: a,
 	}
 	return m
 }
@@ -33,34 +31,36 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	routeParam := v.Get("route")
 
 	if serverType == "" {
-		WriteError(w, http.StatusBadRequest, "must specify at least server type", constants.ErrNoServerType)
+		WriteError(w, http.StatusBadRequest, "at least server type must be specified", constants.ErrNoServerType)
 		return
 	}
-	if remoteOrHandler != "" {
-		if routeParam != "" {
-			ret, err := docs.GetMethodDoc(serverType, remoteOrHandler, routeParam, s.App.GetRemoteDocsRoute())
-			if err != nil {
-				WriteError(w, http.StatusInternalServerError, "failed to get doc by route", err)
-				return
-			}
-			bts, _ := pitaya.GetSerializer().Marshal(ret)
-			Write(w, http.StatusOK, string(bts))
-			return
-		}
 
-		ret, err := docs.GetDocForHandlersOrRemotes(serverType, remoteOrHandler, s.App.GetRemoteDocsRoute())
+	if remoteOrHandler == "" {
+		ret, err := docs.GetDocumentationForServerType(serverType, s.App.GetRemoteDocsRoute())
 		if err != nil {
-			errMsg := fmt.Sprintf("failed to get docs %s", remoteOrHandler)
-			WriteError(w, http.StatusInternalServerError, errMsg, err)
+			WriteError(w, http.StatusInternalServerError, "failed to get docs", err)
 			return
 		}
 		bts, _ := pitaya.GetSerializer().Marshal(ret)
 		Write(w, http.StatusOK, string(bts))
 		return
 	}
-	ret, err := docs.GetDocumentationForServerType(serverType, s.App.GetRemoteDocsRoute())
+
+	if routeParam != "" {
+		ret, err := docs.GetMethodDoc(serverType, remoteOrHandler, routeParam, s.App.GetRemoteDocsRoute())
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, "failed to get doc by route", err)
+			return
+		}
+		bts, _ := pitaya.GetSerializer().Marshal(ret)
+		Write(w, http.StatusOK, string(bts))
+		return
+	}
+
+	ret, err := docs.GetDocForHandlersOrRemotes(serverType, remoteOrHandler, s.App.GetRemoteDocsRoute())
 	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to get docs", err)
+		errMsg := fmt.Sprintf("failed to get docs %s", remoteOrHandler)
+		WriteError(w, http.StatusInternalServerError, errMsg, err)
 		return
 	}
 	bts, _ := pitaya.GetSerializer().Marshal(ret)

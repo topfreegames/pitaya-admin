@@ -37,5 +37,5 @@ func WriteError(w http.ResponseWriter, status int, errorMsg string, err error) {
 func WriteSuccessWithJSON(w http.ResponseWriter, status int, res []byte, msg string) {
 	retMsg := fmt.Sprintf(`{"success" : true, "response":%s}`, res)
 	logger.Log.Info(msg)
-	Write(w, http.StatusOK, retMsg)
+	Write(w, status, retMsg)
 }
