@@ -2,23 +2,28 @@ package rpc
 
 import (
 	"bytes"
-	"io"
+	"compress/gzip"
+	"context"
 	"io/ioutil"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/gogo/protobuf/proto"
+	protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
+	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/constants"
 	"github.com/topfreegames/pitaya-admin/docs"
+	"github.com/topfreegames/pitaya-admin/protos"
 )
 
-// RPCRequest represents a request received by the server to be used in RPC
-type RPCRequest struct {
+// Request represents a request received by the server to be used in RPC
+type Request struct {
 	Route        string
 	FrontendType string
 	ServerID     string
 	Meta         string // Data itself
-	ProtoSource  []byte // This is the proto source file for protos that the method in route will use
+	ProtoSource  string // This is the proto source file name, used to check proto registry
 }
 
 func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute string) (string, string, error) {
@@ -67,28 +72,63 @@ func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute stri
 
 }
 
+func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProto, error) {
+	r, err := gzip.NewReader(bytes.NewReader(compressedDescriptor))
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, constants.ErrGzip
+	}
+
+	fileDescriptorProto := new(protobuf.FileDescriptorProto)
+
+	err = proto.Unmarshal(b, fileDescriptorProto)
+	if err != nil {
+		return nil, err
+	}
+
+	return fileDescriptorProto, nil
+}
+
 // CreateRPCMessagesFromProto outputs the reply and args messages types for a given RPC route using protoparse and dynamic messages
-func CreateRPCMessagesFromProto(frontendtype, route string, protosource []byte, meta, docsRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
+func CreateRPCMessagesFromProto(request Request, docsRemoteRoute, protosRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
 
-	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute)
+	protoRequest := &protos.ProtoName{Name: request.ProtoSource}
+	replyMsg := &protos.ProtoDescriptor{}
 
-	if err != nil {
-		return nil, nil, err
-	}
+	route := request.FrontendType + "." + request.FrontendType + protosRemoteRoute
 
-	parserAccessor := func(filename string) (io.ReadCloser, error) {
-		return ioutil.NopCloser(bytes.NewReader(protosource)), nil
-	}
-	parser := protoparse.Parser{Accessor: parserAccessor}
-	fileDescriptor, err := parser.ParseFiles("")
+	err := pitaya.RPC(context.Background(), route, replyMsg, protoRequest)
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	requestMessage := dynamic.NewMessage(fileDescriptor[0].FindMessage(inputName))
-	responseMessage := dynamic.NewMessage(fileDescriptor[0].FindMessage(outputName))
-	err = requestMessage.UnmarshalJSON([]byte(meta))
+	fileDescriptorProto, err := unpackDescriptor(replyMsg.Desc)
+
+	if err != nil {
+		return nil, nil, constants.ErrGzip
+	}
+
+	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(request.Route, request.FrontendType, docsRemoteRoute)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	requestMessage := dynamic.NewMessage(fileDescriptor.FindMessage(inputName))
+	responseMessage := dynamic.NewMessage(fileDescriptor.FindMessage(outputName))
+	err = requestMessage.UnmarshalJSON([]byte(request.Meta))
 
 	return requestMessage, responseMessage, nil
 }

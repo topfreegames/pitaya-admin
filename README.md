@@ -143,7 +143,7 @@ Returns a json array with servers information
 
 **RPC**
 ---
-Sends a RPC to a pitaya server
+Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc feature and a route that provides protobuff descriptors based on their filename.
 
 * **URL**
 
@@ -160,11 +160,11 @@ Sends a RPC to a pitaya server
         Route          Remote's route
         FrontendType   Remote's type
         ServerID       Remote's server ID (can be empty)
-        Meta           Remote's args data
-        ProtoSource    Proto source file for remotes args and response
+        Meta           Remote's args data serialized
+        ProtoSource    Proto source file name
     `````
 
-    Since pitaya's RPC methods takes protos as an argument and returns protos as a response, the proto source code is used to create dynamic messages and send arguments to a given method specified by it's route and type. A server id can be specified if one wants the method to be sent to given server.
+    Since pitaya's RPC methods takes protos as an argument and returns protos as a response, the proto source code filename is used to create dynamic messages and send it to a given method specified by its route and type. A server id can be specified if one wants the method to be sent to given server.
 
 * **Response Example**
 

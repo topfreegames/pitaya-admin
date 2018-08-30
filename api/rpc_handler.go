@@ -22,7 +22,7 @@ func NewRPCHandler(a *App) *RPCHandler {
 
 // ServeHTTP method
 func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var remote rpc.RPCRequest
+	var remote rpc.Request
 	err := json.NewDecoder(r.Body).Decode(&remote)
 
 	if err != nil {
@@ -30,7 +30,7 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestMessage, responseMessage, err := rpc.CreateRPCMessagesFromProto(remote.FrontendType, remote.Route, remote.ProtoSource, remote.Meta, s.App.GetRemoteDocsRoute())
+	requestMessage, responseMessage, err := rpc.CreateRPCMessagesFromProto(remote, s.App.GetRemoteDocsRoute(), s.App.GetRemoteProtosRoute())
 
 	if err != nil {
 		WriteError(w, http.StatusBadRequest, "failed to create RPC", err)
