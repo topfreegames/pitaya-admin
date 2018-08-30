@@ -23,7 +23,6 @@ type Request struct {
 	FrontendType string
 	ServerID     string
 	Meta         string // Data itself
-	ProtoSource  string // This is the proto source file name, used to check proto registry
 }
 
 func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute string) (string, string, error) {
@@ -94,31 +93,34 @@ func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProt
 	return fileDescriptorProto, nil
 }
 
-// CreateRPCMessagesFromProto outputs the reply and args messages types for a given RPC route using protoparse and dynamic messages
-func CreateRPCMessagesFromProto(request Request, docsRemoteRoute, protosRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
-
-	protoRequest := &protos.ProtoName{Name: request.ProtoSource}
+func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
+	protoRequest := &protos.ProtoName{Name: protoName}
 	replyMsg := &protos.ProtoDescriptor{}
+	rpcRoute := serverType + "." + serverType + protosRemoteRoute
 
-	route := request.FrontendType + "." + request.FrontendType + protosRemoteRoute
-
-	err := pitaya.RPC(context.Background(), route, replyMsg, protoRequest)
+	err := pitaya.RPC(context.Background(), rpcRoute, replyMsg, protoRequest)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	fileDescriptorProto, err := unpackDescriptor(replyMsg.Desc)
 
 	if err != nil {
-		return nil, nil, constants.ErrGzip
+		return nil, err
 	}
 
 	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
+	return dynamic.NewMessage(fileDescriptor.FindMessage(protoName)), nil
+}
+
+// CreateRPCMessagesFromProto outputs the reply and args messages types for a given RPC route using protoparse and dynamic messages
+func CreateRPCMessagesFromProto(request Request, docsRemoteRoute, protosRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
 
 	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(request.Route, request.FrontendType, docsRemoteRoute)
 
@@ -126,9 +128,23 @@ func CreateRPCMessagesFromProto(request Request, docsRemoteRoute, protosRemoteRo
 		return nil, nil, err
 	}
 
-	requestMessage := dynamic.NewMessage(fileDescriptor.FindMessage(inputName))
-	responseMessage := dynamic.NewMessage(fileDescriptor.FindMessage(outputName))
+	requestMessage, err := buildMessage(request.FrontendType, inputName, protosRemoteRoute)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	responseMessage, err := buildMessage(request.FrontendType, outputName, protosRemoteRoute)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
 	err = requestMessage.UnmarshalJSON([]byte(request.Meta))
+
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return requestMessage, responseMessage, nil
 }
