@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/topfreegames/pitaya"
+	"github.com/topfreegames/pitaya-admin/constants"
 	"github.com/topfreegames/pitaya-admin/rpc"
 )
 
@@ -23,6 +24,12 @@ func NewRPCHandler(a *App) *RPCHandler {
 // ServeHTTP method
 func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var remote rpc.Request
+
+	if r.Body == nil {
+		WriteError(w, http.StatusBadRequest, "request body shouldnt be empty", constants.ErrEmptyRequest)
+		return
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&remote)
 
 	if err != nil {
