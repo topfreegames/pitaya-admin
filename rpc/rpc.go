@@ -30,7 +30,7 @@ func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute stri
 	outputName := ""
 	inputName := ""
 
-	remoteMethodDocs, err := docs.GetMethodDoc(frontendtype, "remote", route, docsRemoteRoute)
+	remoteMethodDocs, err := docs.GetMethodDoc(frontendtype, "remote", route, docsRemoteRoute, true)
 
 	if err != nil {
 		return "", "", err

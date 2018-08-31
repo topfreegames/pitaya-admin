@@ -29,6 +29,14 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	serverType := v.Get("type")
 	remoteOrHandler := v.Get("methodtype")
 	routeParam := v.Get("route")
+	protos := v.Get("getProtos")
+	var protoFlag bool
+
+	if protos == "1" {
+		protoFlag = true
+	} else {
+		protoFlag = false
+	}
 
 	if serverType == "" {
 		WriteError(w, http.StatusBadRequest, "at least server type must be specified", constants.ErrNoServerType)
@@ -36,7 +44,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if remoteOrHandler == "" {
-		ret, err := docs.GetDocumentationForServerType(serverType, s.App.GetRemoteDocsRoute())
+		ret, err := docs.GetDocumentationForServerType(serverType, s.App.GetRemoteDocsRoute(), protoFlag)
 		if err != nil {
 			WriteError(w, http.StatusInternalServerError, "failed to get docs", err)
 			return
@@ -47,7 +55,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if routeParam != "" {
-		ret, err := docs.GetMethodDoc(serverType, remoteOrHandler, routeParam, s.App.GetRemoteDocsRoute())
+		ret, err := docs.GetMethodDoc(serverType, remoteOrHandler, routeParam, s.App.GetRemoteDocsRoute(), protoFlag)
 		if err != nil {
 			WriteError(w, http.StatusInternalServerError, "failed to get doc by route", err)
 			return
@@ -57,7 +65,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := docs.GetDocForHandlersOrRemotes(serverType, remoteOrHandler, s.App.GetRemoteDocsRoute())
+	ret, err := docs.GetDocForHandlersOrRemotes(serverType, remoteOrHandler, s.App.GetRemoteDocsRoute(), protoFlag)
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to get docs %s", remoteOrHandler)
 		WriteError(w, http.StatusInternalServerError, errMsg, err)

@@ -78,6 +78,10 @@ Returns server auto documentation given its type. Target server must implement p
 
     Specifies a single method route to get its documentation. Must have specified `methodtype` as well.
 
+    `getProtos=["1"]`
+
+    Specifies if the documentation will have protobuff message names when set to 1.
+
     **Required:**
 
     `type=[server type]`
@@ -92,8 +96,8 @@ Returns server auto documentation given its type. Target server must implement p
     As stated above, in order for documentation routes to work, you will need to implement a remote for pitaya's auto documentation. A simple example is presented below.
 
     ```golang
-        func (c *ConnectorRemote) Docs(ctx context.Context, docArg *protos.Doc) (*protos.Doc, error) {
-            d, err := pitaya.Documentation(true)
+        func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+            d, err := pitaya.Documentation(flag.GetGetProtos())
 
             if err != nil {
                 return nil, err
@@ -105,10 +109,11 @@ Returns server auto documentation given its type. Target server must implement p
             }
 
             return &protos.Doc{Doc: string(doc)}, nil
-        }
+    }
+
     ```
 
-    The boolean passed to `pitaya.Documentation` specifies if the documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
+    The boolean inside `flag` passed to `pitaya.Documentation` specifies if the documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
 
 
 
@@ -198,20 +203,21 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
 
     `````golang
 
-    func (c *ConnectorRemote) Docs(ctx context.Context, docArg *protos.Doc) (*protos.Doc, error) {
-        d, err := pitaya.Documentation(true)
+    func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+	d, err := pitaya.Documentation(flag.GetGetProtos())
 
-        if err != nil {
-            return nil, err
-        }
-        doc, err := json.Marshal(d)
+	if err != nil {
+		return nil, err
+	}
+	doc, err := json.Marshal(d)
 
-        if err != nil {
-            return nil, err
-        }
+	if err != nil {
+		return nil, err
+	}
 
-        return &protos.Doc{Doc: string(doc)}, nil
+	return &protos.Doc{Doc: string(doc)}, nil
     }
+
 
     func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
         protoName := name.Name

@@ -7,13 +7,13 @@ import (
 	"github.com/topfreegames/pitaya-admin/protos"
 )
 
-// GetDocumentationForServerType gets documentation for given server type
-func GetDocumentationForServerType(serverType, docsRemoteRoute string) (map[string]interface{}, error) {
+// GetDocumentationForServerType gets documentation for given server type.
+func GetDocumentationForServerType(serverType, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
 	var ret map[string]interface{}
 	responseProto := &protos.Doc{}
 	route := serverType + "." + serverType + docsRemoteRoute
 
-	err := pitaya.RPC(context.Background(), route, responseProto, &protos.Doc{})
+	err := pitaya.RPC(context.Background(), route, responseProto, &protos.DocMsg{GetProtos: flag})
 
 	if err != nil {
 		return nil, err
@@ -28,8 +28,8 @@ func GetDocumentationForServerType(serverType, docsRemoteRoute string) (map[stri
 	return ret, nil
 }
 
-func getRemotesDoc(serverType, docsRemoteRoute string) (map[string]interface{}, error) {
-	ret, err := GetDocumentationForServerType(serverType, docsRemoteRoute)
+func getRemotesDoc(serverType, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
+	ret, err := GetDocumentationForServerType(serverType, docsRemoteRoute, flag)
 
 	if err != nil {
 		return nil, err
@@ -41,8 +41,8 @@ func getRemotesDoc(serverType, docsRemoteRoute string) (map[string]interface{}, 
 	return retMap, nil
 }
 
-func getHandlersDoc(serverType, docsRemoteRoute string) (map[string]interface{}, error) {
-	ret, err := GetDocumentationForServerType(serverType, docsRemoteRoute)
+func getHandlersDoc(serverType, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
+	ret, err := GetDocumentationForServerType(serverType, docsRemoteRoute, flag)
 
 	if err != nil {
 		return nil, err
@@ -55,17 +55,17 @@ func getHandlersDoc(serverType, docsRemoteRoute string) (map[string]interface{},
 }
 
 // GetDocForHandlersOrRemotes gets only remote or handler docs for given servertype
-func GetDocForHandlersOrRemotes(servertype, handlerOrRemote, docsRemoteRoute string) (map[string]interface{}, error) {
+func GetDocForHandlersOrRemotes(servertype, handlerOrRemote, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
 	if handlerOrRemote == "remote" {
-		return getRemotesDoc(servertype, docsRemoteRoute)
+		return getRemotesDoc(servertype, docsRemoteRoute, flag)
 	}
-	return getHandlersDoc(servertype, docsRemoteRoute)
+	return getHandlersDoc(servertype, docsRemoteRoute, flag)
 
 }
 
 // GetMethodDoc gets documentation for a method given its route and whether it's a remote or a handler
-func GetMethodDoc(servertype, methodType, route, docsRemoteRoute string) (map[string]interface{}, error) {
-	ret, err := GetDocForHandlersOrRemotes(servertype, methodType, docsRemoteRoute)
+func GetMethodDoc(servertype, methodType, route, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
+	ret, err := GetDocForHandlersOrRemotes(servertype, methodType, docsRemoteRoute, flag)
 
 	if err != nil {
 		return nil, err
