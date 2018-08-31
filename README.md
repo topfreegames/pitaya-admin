@@ -17,14 +17,14 @@ make run
 
 **Errors**
 ---
-Whenever pitaya admin respond with an error, it will be in the following format:
+Whenever pitaya admin responds with an error, it will be in the following format:
 `````
 {"success":false, "message":[msg], "reason": [error]}
 `````
 
 **Client Request**
 ---
-Establishes a websocket connection with pitaya admin that can be used to send requests to handlers and receives its outputs through a pitaya client connected to given server address.
+Establishes a websocket connection with pitaya admin that can be used to send requests to handlers and receive theirs outputs through a pitaya client connected to given server address.
 
 * **URL**
 
@@ -89,7 +89,7 @@ Returns server auto documentation given its type. Target server must implement p
 
 * **Requirements**
 
-    As stated above, in order to documentation routes work, you will need to implement a remote for pitaya's auto documentation. A simple example is presented below.
+    As stated above, in order for documentation routes to work, you will need to implement a remote for pitaya's auto documentation. A simple example is presented below.
 
     ```golang
         func (c *ConnectorRemote) Docs(ctx context.Context, docArg *protos.Doc) (*protos.Doc, error) {
@@ -108,13 +108,13 @@ Returns server auto documentation given its type. Target server must implement p
         }
     ```
 
-    The boolean passed to `pitaya.Documentation` specifies whether or not if documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
+    The boolean passed to `pitaya.Documentation` specifies if the documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
 
 
 
 **Kick Users**
 ---
-Send a kick packet to users in a given user list
+Send a kick packet to users in a given user list, breaking the users connections to the pitaya server
 
 * **URL**
 
@@ -185,7 +185,7 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
         Meta           Remote's args data serialized
     `````
 
-    Since pitaya's RPC methods takes protos as an argument and returns protos as a response, pitaya admin uses reflection alongside with pitaya's autodoc feature to make dynamic messages and send them to the server
+    Since pitaya's RPC methods take protos as an argument and return protos as a response, pitaya admin uses reflection alongside with pitaya's autodoc feature to build dynamic messages and send them to the server
 * **Response Example**
 
     `{"success" : true, "response":{"Msg":"hi im a rpc msg"}}`
@@ -194,9 +194,25 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
 
 * **Requirements**
 
-    As stated, in order to RPC work properly, you will need a remote that provides protobuff descriptors via reflection **and** documentation's requirements stated above. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example is presented below
+    As stated, in order to RPC work properly, you will need a remote that provides protobuff descriptors via reflection **and** documentation's remote. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example is presented below
 
     `````golang
+
+    func (c *ConnectorRemote) Docs(ctx context.Context, docArg *protos.Doc) (*protos.Doc, error) {
+        d, err := pitaya.Documentation(true)
+
+        if err != nil {
+            return nil, err
+        }
+        doc, err := json.Marshal(d)
+
+        if err != nil {
+            return nil, err
+        }
+
+        return &protos.Doc{Doc: string(doc)}, nil
+    }
+
     func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
         protoName := name.Name
         protoReflectTypePointer := proto.MessageType(protoName)
