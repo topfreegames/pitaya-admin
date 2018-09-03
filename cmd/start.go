@@ -9,6 +9,7 @@ import (
 	"github.com/topfreegames/pitaya/cluster"
 	"github.com/topfreegames/pitaya/modules"
 	"github.com/topfreegames/pitaya/serialize/json"
+	"github.com/topfreegames/pitaya/serialize/protobuf"
 )
 
 var bind string
@@ -17,6 +18,7 @@ var port int
 var rpcServerPort string
 var svType string
 var usesGrpc bool
+var usesJSON bool
 
 var startCmd = &cobra.Command{
 	Use:   "start",
@@ -33,7 +35,9 @@ var startCmd = &cobra.Command{
 		})
 
 		cmdL.Info("starting pitaya admin")
-		app, err := api.NewApp(bind, port, usesGrpc)
+		conf := viper.New()
+
+		app, err := api.NewApp(bind, port, conf)
 
 		if err != nil {
 			cmdL.Fatal(err)
@@ -42,7 +46,11 @@ var startCmd = &cobra.Command{
 		defer pitaya.Shutdown()
 		app.Init()
 
-		pitaya.SetSerializer(json.NewSerializer())
+		if usesJSON {
+			pitaya.SetSerializer(json.NewSerializer())
+		} else {
+			pitaya.SetSerializer(protobuf.NewSerializer())
+		}
 
 		if usesGrpc {
 			if rpcServerPort == "" {
@@ -83,6 +91,7 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
+	startCmd.Flags().BoolVarP(&usesJSON, "usesJSON", "j", true, "if server uses json or not")
 	startCmd.Flags().BoolVarP(&usesGrpc, "usesGrpc", "g", false, "if server uses or not grpc")
 	startCmd.Flags().StringVarP(&rpcServerPort, "rpcServerPort", "r", "", "the port that grpc server will listen")
 	startCmd.Flags().BoolVar(&isFrontend, "isFrontend", false, "if server is frontend")

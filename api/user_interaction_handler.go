@@ -2,11 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/topfreegames/pitaya"
-	"github.com/topfreegames/pitaya/logger"
 )
 
 type pushMsg struct {
@@ -16,7 +14,7 @@ type pushMsg struct {
 	FrontendType string
 }
 
-// PushToUsersHandler handler
+// PushToUsersHandler handle push route
 type PushToUsersHandler struct {
 	App *App
 }
@@ -33,18 +31,14 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&push)
 
 	if err != nil {
-		logger.Log.Errorf("error trying to decode request body into push struct: %s", err.Error())
-		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to decode request body into push struct", "reason": "%s"}`, err.Error())
-		Write(w, http.StatusBadRequest, errMsg)
+		WriteError(w, http.StatusInternalServerError, "failed to decode request body into push struct", err)
 		return
 	}
 
 	err = pitaya.SendPushToUsers(push.Route, push.Message, push.Uids, push.FrontendType)
 
 	if err != nil {
-		logger.Log.Errorf("error trying to send push to user: %s", err.Error())
-		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to send push to user", "reason": "%s"}`, err.Error())
-		Write(w, http.StatusBadRequest, errMsg)
+		WriteError(w, http.StatusInternalServerError, "failed to send push to user", err)
 		return
 	}
 
@@ -57,7 +51,7 @@ type kickMsg struct {
 	FrontendType string
 }
 
-// KickUserHandler handler
+// KickUserHandler handle kick route
 type KickUserHandler struct {
 	App *App
 }
@@ -73,18 +67,14 @@ func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&kick)
 
 	if err != nil {
-		logger.Log.Errorf("error trying to decode request body into kick struct: %s", err.Error())
-		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to decode request body into kick struct", "reason": "%s"}`, err.Error())
-		Write(w, http.StatusBadRequest, errMsg)
+		WriteError(w, http.StatusInternalServerError, "failed to decode request body into kick struct", err)
 		return
 	}
 
 	err = pitaya.SendKickToUsers(kick.Uids, kick.FrontendType)
 
 	if err != nil {
-		logger.Log.Errorf("error trying to kick user: %s", err.Error())
-		errMsg := fmt.Sprintf(`{"success":false, "message":"failed to kick user", "reason": "%s"}`, err.Error())
-		Write(w, 500, errMsg)
+		WriteError(w, http.StatusInternalServerError, "failed to kick user", err)
 		return
 	}
 

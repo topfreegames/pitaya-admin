@@ -5,34 +5,38 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/gorilla/mux"
 )
 
 // App struct
 type App struct {
-	Address  string
-	Router   *mux.Router
-	Server   *http.Server
-	Logger   logrus.FieldLogger
-	usesGrpc bool
+	Address string
+	Router  *mux.Router
+	Server  *http.Server
+	Logger  logrus.FieldLogger
+	Config  *viper.Viper
 }
 
 // NewApp constructor
 func NewApp(
 	host string,
 	port int,
-	usesGrpc bool,
+	config *viper.Viper,
 ) (*App, error) {
 	a := &App{
-		Address:  fmt.Sprintf("%s:%d", host, port),
-		usesGrpc: usesGrpc,
+		Address: fmt.Sprintf("%s:%d", host, port),
+		Config:  config,
 	}
 	a.configureApp()
 	return a, nil
 }
 
 func (a *App) configureApp() {
+	a.Config.SetDefault("pitayaadmin.request.readdeadline", "15s")
+	a.Config.SetDefault("pitayaadmin.routes.docs", "remote.docs")
+	a.Config.SetDefault("pitayaadmin.routes.protos", "remote.proto")
 	a.Router = a.getRouter()
 	a.configureServer()
 }
@@ -46,13 +50,26 @@ func (a *App) configureServer() {
 
 func (a *App) getRouter() *mux.Router {
 	router := mux.NewRouter()
+	router.Handle("/docs", NewDocsHandler(a)).Methods("GET")
+	router.Handle("/request", NewRequestHandler(a)).Methods("GET")
+	router.Handle("/rpc", NewRPCHandler(a)).Methods("POST")
 	router.Handle("/servers", NewServersHandler(a)).Methods("GET")
-	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
 	router.Handle("/user/kick", NewKickUserHandler(a)).Methods("POST")
+	router.Handle("/user/push", NewPushToUsersHandler(a)).Methods("POST")
 	return router
 }
 
 // Init starts the app
 func (a *App) Init() {
 	go a.Server.ListenAndServe()
+}
+
+// GetRemoteDocsRoute gets the route for the autodoc handler
+func (a *App) GetRemoteDocsRoute() string {
+	return a.Config.GetString("pitayaadmin.routes.docs")
+}
+
+// GetRemoteProtosRoute gets the route for the protos handler
+func (a *App) GetRemoteProtosRoute() string {
+	return a.Config.GetString("pitayaadmin.routes.protos")
 }
