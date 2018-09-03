@@ -10,7 +10,9 @@ run:
 run-grpc:
 	@go run main.go start -g true -r 3939
 
+test-dep:
+	cd examples/ && go run main.go && cd - & sleep 1
 
-test:
-	cd ../pitaya/examples/demo/cluster/ && go run main.go && cd -   && sleep 1 &
-	go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out && pkill main
+
+test: test-dep
+	go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast && sleep 1 && pkill main

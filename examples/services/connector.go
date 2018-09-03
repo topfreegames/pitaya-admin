@@ -9,8 +9,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/topfreegames/pitaya"
+	"github.com/topfreegames/pitaya-admin/examples/protos"
 	"github.com/topfreegames/pitaya/component"
-	"github.com/topfreegames/pitaya/examples/demo/protos"
 )
 
 // ConnectorRemote is a remote that will receive rpc's
@@ -98,8 +98,8 @@ func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*p
 }
 
 // Docs returns documentation
-func (c *ConnectorRemote) Docs(ctx context.Context, ddd *protos.Doc) (*protos.Doc, error) {
-	d, err := pitaya.Documentation(true)
+func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+	d, err := pitaya.Documentation(flag.GetGetProtos())
 
 	if err != nil {
 		return nil, err

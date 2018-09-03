@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/topfreegames/pitaya"
+	"github.com/topfreegames/pitaya-admin/examples/services"
 	"github.com/topfreegames/pitaya/acceptor"
 	"github.com/topfreegames/pitaya/cluster"
 	"github.com/topfreegames/pitaya/component"
-	"github.com/topfreegames/pitaya/examples/demo/cluster/services"
 	"github.com/topfreegames/pitaya/route"
 	"github.com/topfreegames/pitaya/serialize/json"
 	"github.com/topfreegames/pitaya/session"
@@ -61,7 +61,7 @@ func configureFrontend(port int) {
 }
 
 func main() {
-	port := flag.Int("port", 3255, "the port to listen")
+	port := flag.Int("port", 3250, "the port to listen")
 	svType := flag.String("type", "connector", "the server type")
 	isFrontend := flag.Bool("frontend", true, "if server is frontend")
 

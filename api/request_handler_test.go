@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"log"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -30,17 +29,6 @@ func TestRequestHandler(t *testing.T) {
 	assert.NoError(t, err)
 	defer ws.Close()
 
-	go func() {
-		for {
-			_, message, err := ws.ReadMessage()
-			if err != nil {
-				log.Println("read:", err)
-				return
-			}
-			log.Printf("received: %s", message)
-		}
-	}()
-
 	firstRequest := &request.RequestMsg{
 		Route:     "connector.setsessiondata",
 		Payload:   []byte(`{"data":{"key1":"value1"}}`),
@@ -48,13 +36,5 @@ func TestRequestHandler(t *testing.T) {
 	}
 	err = ws.WriteJSON(firstRequest)
 
-	assert.NoError(t, err)
-
-	secondRequest := &request.RequestMsg{
-		Route:     "connector.getsessiondata",
-		Payload:   []byte(""),
-		IsRequest: true,
-	}
-	err = ws.WriteJSON(secondRequest)
 	assert.NoError(t, err)
 }
