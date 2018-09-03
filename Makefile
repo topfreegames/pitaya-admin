@@ -11,8 +11,8 @@ run-grpc:
 	@go run main.go start -g true -r 3939
 
 test-dep:
-	cd examples/ && go run main.go && cd - & sleep 1
-
+	@cd examples/ && go run main.go 2>/dev/null && cd - & sleep 5
 
 test: test-dep
-	go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast && sleep 1 && pkill main
+	@echo "=========RUNNING UNIT TESTS==========="
+	@go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast && pkill main

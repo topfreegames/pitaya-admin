@@ -72,7 +72,6 @@ func (c *Connector) NotifySessionData(ctx context.Context, data *SessionData) {
 
 // RemoteFunc is a function that will be called remotely
 func (c *ConnectorRemote) RemoteFunc(ctx context.Context, msg *protos.RPCMsg) (*protos.RPCRes, error) {
-	fmt.Printf("received a remote call with this message: %s\n", msg.GetMsg())
 	return &protos.RPCRes{
 		Msg: msg.GetMsg(),
 	}, nil
