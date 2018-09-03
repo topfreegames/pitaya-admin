@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/topfreegames/pitaya"
 
@@ -30,12 +31,15 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	remoteOrHandler := v.Get("methodtype")
 	routeParam := v.Get("route")
 	protos := v.Get("getProtos")
-	var protoFlag bool
+	protoFlag := false
+	var err error
 
-	if protos == "1" {
-		protoFlag = true
-	} else {
-		protoFlag = false
+	if protos != "" {
+		protoFlag, err = strconv.ParseBool(protos)
+		if err != nil {
+			WriteError(w, http.StatusBadRequest, "invalid getprotos flag", err)
+			return
+		}
 	}
 
 	if serverType == "" {
