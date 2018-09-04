@@ -15,18 +15,13 @@ import (
 
 // Message struct as sent by pitaya
 type Message struct {
-	Type       byte
-	ID         uint
-	Route      string
-	Data       []byte
-	compressed bool
-	Err        bool
+	Data []byte
 }
 
 func TestRequestHandler(t *testing.T) {
 	t.Parallel()
 
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	a := pt.TestApp
@@ -46,6 +41,7 @@ func TestRequestHandler(t *testing.T) {
 		IsRequest: false,
 	}
 	err = ws.WriteJSON(firstRequest)
+	assert.NoError(t, err)
 
 	secondRequest := &request.RequestMsg{
 		Route:     "connector.getsessiondata",

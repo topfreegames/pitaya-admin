@@ -13,7 +13,7 @@ import (
 
 func TestGetServerList(t *testing.T) {
 	t.Parallel()
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	a := pt.TestApp

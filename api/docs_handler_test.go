@@ -12,7 +12,7 @@ import (
 
 func TestGetDocs(t *testing.T) {
 	t.Parallel()
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	a := pt.TestApp

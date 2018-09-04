@@ -13,7 +13,7 @@ import (
 
 func TestCreateRPCMessagesFromProto(t *testing.T) {
 	t.Parallel()
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 

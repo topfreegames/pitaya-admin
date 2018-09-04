@@ -12,18 +12,9 @@ import (
 	"github.com/topfreegames/pitaya/client"
 )
 
-type Message struct {
-	Type       byte   // message type
-	ID         uint   // unique id, zero while notify mode
-	Route      string // route for locating service
-	Data       []byte // payload
-	compressed bool   // is message compressed
-	Err        bool   // is an error message
-}
-
 func TestProcessMessage(t *testing.T) {
 
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 

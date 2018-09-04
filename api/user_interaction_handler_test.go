@@ -14,7 +14,7 @@ import (
 
 func TestPushHandler(t *testing.T) {
 	t.Parallel()
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	a := pt.TestApp
@@ -107,7 +107,7 @@ func TestPushHandler(t *testing.T) {
 
 func TestKickHandler(t *testing.T) {
 	// t.Parallel()
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	a := pt.TestApp

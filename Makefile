@@ -10,11 +10,11 @@ run-grpc:
 	@go run main.go start -g true -r 3939
 
 test-dep:
-	@examples/./server 2>/dev/null & echo $$! > testserver.pid
+	@testing/server 2>/dev/null & echo $$! > testserver.pid
 
 go-test:
 	@echo "=========RUNNING UNIT TESTS==========="
-	@sleep 5
+	@sleep 10
 	@-go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast
 
 .SILENT:

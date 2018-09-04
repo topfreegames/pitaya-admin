@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetDocumentationForServerType(t *testing.T) {
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 	tables := []struct {
@@ -40,7 +40,7 @@ func TestGetDocumentationForServerType(t *testing.T) {
 
 func TestGetDocForHandlersOrRemotes(t *testing.T) {
 
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 
@@ -66,7 +66,7 @@ func TestGetDocForHandlersOrRemotes(t *testing.T) {
 
 func TestGetMethodDoc(t *testing.T) {
 
-	if pt.IsConf == false {
+	if !pt.IsConf {
 		pt.ConfApp()
 	}
 

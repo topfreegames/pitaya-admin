@@ -12,11 +12,11 @@ import (
 
 // App struct
 type App struct {
-	Address      string
-	Router       *mux.Router
-	Server       *http.Server
-	Logger       logrus.FieldLogger
-	Config       *viper.Viper
+	Address string
+	Router  *mux.Router
+	Server  *http.Server
+	Logger  logrus.FieldLogger
+	Config  *viper.Viper
 }
 
 // NewApp constructor
