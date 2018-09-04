@@ -32,7 +32,7 @@ func TestRPC(t *testing.T) {
 	}{
 		"test_empty_body": {
 			request: func() *http.Request {
-				request, err := http.NewRequest("POST", "", nil)
+				request, err := http.NewRequest("POST", "/rpc", nil)
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -48,7 +48,7 @@ func TestRPC(t *testing.T) {
 				body := "not a rpc request struct"
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/rpc", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -59,7 +59,7 @@ func TestRPC(t *testing.T) {
 
 			},
 		},
-		"test_bad_rpc": {
+		"test_bad_route": {
 			request: func() *http.Request {
 				body := &rpc.Request{
 					Route:        "ro.u.te",
@@ -69,7 +69,7 @@ func TestRPC(t *testing.T) {
 				}
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/rpc", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -79,7 +79,7 @@ func TestRPC(t *testing.T) {
 		},
 		"test_success_rpc": {
 			request: func() *http.Request {
-				rpcMessage := &protos.RPCMsg{Msg: "hi im a rpc msg"}
+				rpcMessage := &protos.RPCMsg{Msg: "hi im a rpc testing msg"}
 				jsonProtobuffMarshaler := jsonpb.Marshaler{}
 				rpcMessageSerialized, err := jsonProtobuffMarshaler.MarshalToString(rpcMessage)
 				assert.NoError(t, err)
@@ -91,12 +91,14 @@ func TestRPC(t *testing.T) {
 				}
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/rpc", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
 			asserts: func(response *httptest.ResponseRecorder) {
-				assert.Equal(t, 200, response.Code)
+				b := response.Body.String()
+				assert.Equal(t, http.StatusOK, response.Code)
+				assert.Equal(t, `{"success" : true, "response":{"Msg":"hi im a rpc testing msg"}}`, b)
 			},
 		},
 		"id_not_correct": {
@@ -113,7 +115,7 @@ func TestRPC(t *testing.T) {
 				}
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/rpc", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),

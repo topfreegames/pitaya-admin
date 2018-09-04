@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/spf13/viper"
@@ -19,7 +18,6 @@ var IsConf bool
 // ConfApp configure a default test app
 func ConfApp() {
 
-	fmt.Println("Configuring")
 	conf := viper.New()
 	TestApp, _ = api.NewApp("0.0.0.0", 8000, conf)
 

@@ -29,7 +29,7 @@ func TestPushHandler(t *testing.T) {
 	}{
 		"test_empty_body": {
 			request: func() *http.Request {
-				request, err := http.NewRequest("POST", "", nil)
+				request, err := http.NewRequest("POST", "/user/push", nil)
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -45,7 +45,7 @@ func TestPushHandler(t *testing.T) {
 				body := "not a pushmsg struct"
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/push", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -56,7 +56,7 @@ func TestPushHandler(t *testing.T) {
 
 			},
 		},
-		"test_bad_rpc": {
+		"test_bad_push_request": {
 			request: func() *http.Request {
 				body := &api.PushMsg{
 					Uids:         []string{"1", "2"},
@@ -66,7 +66,7 @@ func TestPushHandler(t *testing.T) {
 				}
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/push", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -84,7 +84,7 @@ func TestPushHandler(t *testing.T) {
 				}
 				bts, err := json.Marshal(body)
 				assert.NoError(t, err)
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/push", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -122,7 +122,7 @@ func TestKickHandler(t *testing.T) {
 	}{
 		"test_empty_body": {
 			request: func() *http.Request {
-				request, err := http.NewRequest("POST", "", nil)
+				request, err := http.NewRequest("POST", "/user/kick", nil)
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -138,7 +138,7 @@ func TestKickHandler(t *testing.T) {
 				body := "not a kick msg struct"
 				bts, _ := json.Marshal(body)
 
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/kick", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -156,7 +156,7 @@ func TestKickHandler(t *testing.T) {
 				}
 				bts, err := json.Marshal(body)
 				assert.NoError(t, err)
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/kick", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),
@@ -172,7 +172,7 @@ func TestKickHandler(t *testing.T) {
 				}
 				bts, err := json.Marshal(body)
 				assert.NoError(t, err)
-				request, err := http.NewRequest("POST", "", bytes.NewReader(bts))
+				request, err := http.NewRequest("POST", "/user/kick", bytes.NewReader(bts))
 				assert.NoError(t, err)
 				return request
 			}(),

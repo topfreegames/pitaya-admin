@@ -2,7 +2,7 @@ package request_test
 
 import (
 	"encoding/json"
-	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -57,12 +57,22 @@ func TestListenForClientMessages(t *testing.T) {
 	err := pClient.ConnectTo("localhost:3250")
 	assert.NoError(t, err)
 	defer pClient.Disconnect()
-
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go request.ListenForClientMessages(pClient, func(m interface{}) error {
-		byteMessage, err := json.Marshal(m)
+
+		msg, err := json.Marshal(m)
 		assert.NoError(t, err)
-		fmt.Println(byteMessage)
+		assert.NotNil(t, msg)
+		wg.Done()
 		return nil
 	})
-
+	m2 := request.RequestMsg{
+		Route:     "connector.connectorremote.getsessiondata",
+		Payload:   nil,
+		IsRequest: true,
+	}
+	err = request.ProcessMessage(m2, pClient)
+	assert.NoError(t, err)
+	wg.Wait()
 }

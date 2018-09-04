@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/examples/protos"
+	pitayaprotos "github.com/topfreegames/pitaya-admin/protos"
 	"github.com/topfreegames/pitaya/component"
 )
 
@@ -78,7 +79,7 @@ func (c *ConnectorRemote) RemoteFunc(ctx context.Context, msg *protos.RPCMsg) (*
 }
 
 // Proto is a function that will be called remotely to get the game proto specified by name.doc
-func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
+func (c *ConnectorRemote) Proto(ctx context.Context, name *pitayaprotos.ProtoName) (*pitayaprotos.ProtoDescriptor, error) {
 	protoName := name.Name
 	protoReflectTypePointer := proto.MessageType(protoName)
 	protoReflectType := protoReflectTypePointer.Elem()
@@ -91,13 +92,13 @@ func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*p
 
 	descriptorValue := descriptorMethod.Func.Call([]reflect.Value{protoValue})
 	protoDescriptor := descriptorValue[0].Bytes()
-	return &protos.ProtoDescriptor{
+	return &pitayaprotos.ProtoDescriptor{
 		Desc: protoDescriptor,
 	}, nil
 }
 
 // Docs returns documentation
-func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+func (c *ConnectorRemote) Docs(ctx context.Context, flag *pitayaprotos.DocMsg) (*pitayaprotos.Doc, error) {
 	d, err := pitaya.Documentation(flag.GetGetProtos())
 
 	if err != nil {
@@ -109,5 +110,5 @@ func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*proto
 		return nil, err
 	}
 
-	return &protos.Doc{Doc: string(doc)}, nil
+	return &pitayaprotos.Doc{Doc: string(doc)}, nil
 }

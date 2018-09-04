@@ -3,6 +3,7 @@ package api_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,9 @@ func TestGetServerList(t *testing.T) {
 				return request
 			}(),
 			asserts: func(response *httptest.ResponseRecorder) {
+				b := response.Body.String()
 				assert.Equal(t, http.StatusOK, response.Code)
+				assert.Regexp(t, regexp.MustCompile(`\A\{"success" : true, "response":(\[\{"id":"([a-z0-9-]*)*","type":"([a-z0-9-._]*)","metadata":\{(.)*\},"frontend":(true|false)\},*)+\]\}`), b)
 			},
 		},
 		"test_get_servers_type": {

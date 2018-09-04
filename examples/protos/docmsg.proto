@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package protos;
-
-message DocMsg {
-    bool getProtos = 1;
-}

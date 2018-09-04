@@ -1,6 +1,5 @@
 TESTABLE_PACKAGES = `go list ./... | grep -v examples | grep -v constants | grep -v testing | grep -v cmd | grep -v protos`
 
-
 setup:
 	@dep ensure
 
@@ -11,8 +10,18 @@ run-grpc:
 	@go run main.go start -g true -r 3939
 
 test-dep:
-	@cd examples/ && go run main.go 2>/dev/null && cd - & sleep 5
+	@examples/./server 2>/dev/null & echo $$! > testserver.pid
 
-test: test-dep
+go-test:
 	@echo "=========RUNNING UNIT TESTS==========="
-	@go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast && pkill main
+	@sleep 5
+	@-go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast
+
+.SILENT:
+kill-test-server:
+	if [ -e testserver.pid ]; then \
+		kill -TERM $$(cat testserver.pid) || true; \
+		rm testserver.pid || true; \
+	fi;
+
+test: test-dep go-test kill-test-server
