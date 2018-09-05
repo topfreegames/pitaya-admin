@@ -120,7 +120,7 @@ func TestRPC(t *testing.T) {
 				return request
 			}(),
 			asserts: func(response *httptest.ResponseRecorder) {
-				assert.Equal(t, http.StatusInternalServerError, response.Code)
+				assert.Equal(t, http.StatusNotFound, response.Code)
 			},
 		},
 	}

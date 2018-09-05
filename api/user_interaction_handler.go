@@ -43,6 +43,12 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//calling SendPushToUsers from a backend server, must have frontend type specified
+	if push.FrontendType == "" {
+		WriteError(w, http.StatusBadRequest, "server type needs to be specified", constants.ErrNoServerType)
+		return
+	}
+
 	err = pitaya.SendPushToUsers(push.Route, push.Message, push.Uids, push.FrontendType)
 
 	if err != nil {
@@ -83,6 +89,11 @@ func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		WriteError(w, http.StatusBadRequest, "failed to decode request body into kick struct", err)
+		return
+	}
+
+	if kick.FrontendType == "" {
+		WriteError(w, http.StatusBadRequest, "server type needs to be specified", constants.ErrNoServerType)
 		return
 	}
 

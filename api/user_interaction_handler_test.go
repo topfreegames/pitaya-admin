@@ -56,7 +56,7 @@ func TestPushHandler(t *testing.T) {
 
 			},
 		},
-		"test_bad_push_request": {
+		"test_bad_route": {
 			request: func() *http.Request {
 				body := &api.PushMsg{
 					Uids:         []string{"1", "2"},
@@ -71,7 +71,7 @@ func TestPushHandler(t *testing.T) {
 				return request
 			}(),
 			asserts: func(response *httptest.ResponseRecorder) {
-				assert.Equal(t, http.StatusInternalServerError, response.Code)
+				assert.Equal(t, http.StatusBadRequest, response.Code)
 			},
 		},
 		"test_success": {
@@ -148,7 +148,7 @@ func TestKickHandler(t *testing.T) {
 				assert.Equal(t, `{"success":false, "message":"failed to decode request body into kick struct", "reason": "json: cannot unmarshal string into Go value of type api.KickMsg"}`, b)
 			},
 		},
-		"test_bad_rpc": {
+		"test_bad_route": {
 			request: func() *http.Request {
 				body := &api.KickMsg{
 					Uids:         []string{"1", "2"},
@@ -161,7 +161,7 @@ func TestKickHandler(t *testing.T) {
 				return request
 			}(),
 			asserts: func(response *httptest.ResponseRecorder) {
-				assert.Equal(t, http.StatusInternalServerError, response.Code)
+				assert.Equal(t, http.StatusBadRequest, response.Code)
 			},
 		},
 		"test_success": {
