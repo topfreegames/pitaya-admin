@@ -37,6 +37,7 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 	pitayaAddress := v.Get("address")
 	ws, err := upgrader.Upgrade(w, r, nil)
+
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to establish websocket", err)
 		return
@@ -57,6 +58,8 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ws.Close()
 		return
 	}
+
+	logger.Log.Info("connected to pitaya")
 
 	defer pClient.Disconnect()
 

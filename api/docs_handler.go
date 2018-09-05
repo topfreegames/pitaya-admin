@@ -50,7 +50,7 @@ func (s *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if remoteOrHandler == "" {
 		ret, err := docs.GetDocumentationForServerType(serverType, s.App.GetRemoteDocsRoute(), protoFlag)
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "failed to get docs", err)
+			WriteError(w, http.StatusNotFound, "failed to get docs", err)
 			return
 		}
 		bts, _ := pitaya.GetSerializer().Marshal(ret)

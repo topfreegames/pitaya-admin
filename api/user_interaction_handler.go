@@ -5,9 +5,11 @@ import (
 	"net/http"
 
 	"github.com/topfreegames/pitaya"
+	"github.com/topfreegames/pitaya-admin/constants"
 )
 
-type pushMsg struct {
+// PushMsg post
+type PushMsg struct {
 	Uids         []string
 	Route        string
 	Message      interface{}
@@ -27,11 +29,23 @@ func NewPushToUsersHandler(a *App) *PushToUsersHandler {
 
 // ServeHTTP method
 func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var push pushMsg
+	var push PushMsg
+
+	if r.Body == nil {
+		WriteError(w, http.StatusBadRequest, "request body shouldnt be empty", constants.ErrEmptyRequest)
+		return
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&push)
 
 	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to decode request body into push struct", err)
+		WriteError(w, http.StatusBadRequest, "failed to decode request body into push struct", err)
+		return
+	}
+
+	//calling SendPushToUsers from a backend server, must have frontend type specified
+	if push.FrontendType == "" {
+		WriteError(w, http.StatusBadRequest, "server type needs to be specified", constants.ErrNoServerType)
 		return
 	}
 
@@ -46,7 +60,8 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type kickMsg struct {
+// KickMsg post
+type KickMsg struct {
 	Uids         []string
 	FrontendType string
 }
@@ -63,11 +78,22 @@ func NewKickUserHandler(a *App) *KickUserHandler {
 }
 
 func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var kick kickMsg
+	var kick KickMsg
+
+	if r.Body == nil {
+		WriteError(w, http.StatusBadRequest, "request body shouldnt be empty", constants.ErrEmptyRequest)
+		return
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&kick)
 
 	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to decode request body into kick struct", err)
+		WriteError(w, http.StatusBadRequest, "failed to decode request body into kick struct", err)
+		return
+	}
+
+	if kick.FrontendType == "" {
+		WriteError(w, http.StatusBadRequest, "server type needs to be specified", constants.ErrNoServerType)
 		return
 	}
 

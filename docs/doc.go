@@ -2,6 +2,7 @@ package docs
 
 import (
 	"context"
+	"errors"
 
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/protos"
@@ -49,7 +50,11 @@ func getHandlersDoc(serverType, docsRemoteRoute string, flag bool) (map[string]i
 	}
 
 	rM := ret["handlers"]
-	retMap, _ := rM.(map[string]interface{})
+	retMap, ok := rM.(map[string]interface{})
+
+	if !ok {
+		return nil, errors.New("Fail")
+	}
 
 	return retMap, nil
 }

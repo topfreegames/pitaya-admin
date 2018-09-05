@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package protos;
+
+
+// RPCRes is the rpc response
+message RPCRes {
+    string Msg = 1;
+  }

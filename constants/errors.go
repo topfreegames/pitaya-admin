@@ -9,4 +9,5 @@ var (
 	ErrProtoDoc             = errors.New("for using RPC you must have autodoc implemented on given server type")
 	ErrNoServerType         = errors.New("no server type chosen for getting autodoc")
 	ErrGzip                 = errors.New("failed to unzip gzip binary")
+	ErrEmptyRequest         = errors.New("empty request body")
 )
