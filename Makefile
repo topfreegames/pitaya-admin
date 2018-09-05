@@ -9,7 +9,10 @@ run:
 run-grpc:
 	@go run main.go start -g true -r 3939
 
-test-dep:
+ensure-test-bin:
+	@[ -f testing/server ] || go build -o testing/server examples/main.go
+
+test-dep: ensure-test-bin
 	@testing/server 2>/dev/null & echo $$! > testserver.pid
 
 go-test:
