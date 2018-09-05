@@ -23,3 +23,7 @@ debug
 # vim temp files
 *.swp
 *.swo
+
+
+testing/server
+
