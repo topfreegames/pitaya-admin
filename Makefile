@@ -14,8 +14,8 @@ test-dep:
 
 go-test:
 	@echo "=========RUNNING UNIT TESTS==========="
-	@sleep 10
-	@-go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast
+	@sleep 2
+	@-go test $(TESTABLE_PACKAGES) -coverprofile coverprofile.out -failfast -count=1
 
 .SILENT:
 kill-test-server:
