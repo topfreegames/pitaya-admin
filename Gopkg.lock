@@ -34,6 +34,14 @@
   version = "v3.3.9"
 
 [[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
@@ -61,12 +69,15 @@
   version = "v0.16.0"
 
 [[projects]]
-  digest = "1:bfc758d5a03d57d97226fac6934551c01bd76612adb119c177395b057a0a46db"
+  digest = "1:35621fe20f140f05a0c4ef662c26c0ab4ee50bca78aa30fe87d33120bd28165e"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
+    "jsonpb",
     "proto",
     "protoc-gen-gogo/descriptor",
+    "sortkeys",
+    "types",
   ]
   pruneopts = "UT"
   revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
@@ -227,6 +238,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "UT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:b6221ec0f8903b556e127c449e7106b63e6867170c2d10a7c058623d086f2081"
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus"]
@@ -327,8 +346,16 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:18752d0b95816a1b777505a97f71c7467a8445b8ffb55631a7bf779f6ba4fa83"
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  pruneopts = "UT"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
+
+[[projects]]
   branch = "master"
-  digest = "1:d01fcb8ac01486162b2cd006f9c76f110b74ea980f45f7ac40fce0ac07f8d668"
+  digest = "1:e17a2f8b72ed683a06ba16899434fa1e15c7ec0615a0d385a9574acdd626b0d8"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -343,6 +370,7 @@
     "defaultpipelines",
     "docgenerator",
     "errors",
+    "examples/demo/protos",
     "interfaces",
     "internal/codec",
     "internal/message",
@@ -490,6 +518,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gogo/protobuf/jsonpb",
     "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/protoc-gen-go/descriptor",
@@ -500,13 +529,20 @@
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
+    "github.com/stretchr/testify/assert",
     "github.com/topfreegames/pitaya",
+    "github.com/topfreegames/pitaya/acceptor",
     "github.com/topfreegames/pitaya/client",
     "github.com/topfreegames/pitaya/cluster",
+    "github.com/topfreegames/pitaya/component",
+    "github.com/topfreegames/pitaya/constants",
+    "github.com/topfreegames/pitaya/examples/demo/protos",
     "github.com/topfreegames/pitaya/logger",
     "github.com/topfreegames/pitaya/modules",
+    "github.com/topfreegames/pitaya/route",
     "github.com/topfreegames/pitaya/serialize/json",
     "github.com/topfreegames/pitaya/serialize/protobuf",
+    "github.com/topfreegames/pitaya/session",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

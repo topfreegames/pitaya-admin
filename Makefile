@@ -13,6 +13,7 @@ ensure-test-bin:
 	@[ -f testing/server ] || go build -o testing/server examples/main.go
 
 test-dep: ensure-test-bin
+	@cd testing/ && docker-compose up -d
 	@testing/server 2>/dev/null & echo $$! > testserver.pid
 
 go-test:
@@ -27,4 +28,12 @@ kill-test-server:
 		rm testserver.pid || true; \
 	fi;
 
-test: test-dep go-test kill-test-server
+kill-testing-deps:
+	@cd testing/ && docker-compose down; true
+
+setup-ci:
+	@go get -u github.com/golang/dep/cmd/dep
+	@go get -u github.com/wadey/gocovmerge
+	@dep ensure
+
+test: kill-testing-deps test-dep go-test kill-test-server
