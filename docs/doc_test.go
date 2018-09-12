@@ -9,6 +9,7 @@ import (
 )
 
 func TestGetDocumentationForServerType(t *testing.T) {
+	t.Parallel()
 	if !pt.IsConf {
 		pt.ConfApp()
 	}
@@ -39,7 +40,7 @@ func TestGetDocumentationForServerType(t *testing.T) {
 }
 
 func TestGetDocForHandlersOrRemotes(t *testing.T) {
-
+	t.Parallel()
 	if !pt.IsConf {
 		pt.ConfApp()
 	}
