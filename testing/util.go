@@ -26,6 +26,6 @@ func ConfApp() {
 	pitaya.SetSerializer(json.NewSerializer())
 	pitaya.Configure(false, "pitaya-admin", pitaya.Cluster, map[string]string{})
 	go pitaya.Start()
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	IsConf = true
 }

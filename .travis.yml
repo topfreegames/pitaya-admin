@@ -1,0 +1,8 @@
+language: go
+go:
+  - "1.11"
+services:
+  - docker
+sudo: false
+before_script: make setup-ci
+script: make test

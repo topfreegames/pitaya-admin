@@ -2,7 +2,7 @@ package constants
 
 import "errors"
 
-// Errors that could be ocurred
+// Errors that could be occurred
 var (
 	ErrNoOutputDocForMethod = errors.New("failed to get output documentation for given method")
 	ErrNoInputDocForMethod  = errors.New("failed to get input documentation for given method")
