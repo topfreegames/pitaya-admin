@@ -6,3 +6,5 @@ services:
 sudo: false
 before_script: make setup-ci
 script: make test
+after_success:
+  - ./scripts/push_to_docker.sh
