@@ -227,27 +227,25 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
 
   		return &protos.Doc{Doc: string(doc)}, nil
   }
-  ```
 
+  func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
+       protoName := name.Name
+       protoReflectTypePointer := proto.MessageType(protoName)
+       protoReflectType := protoReflectTypePointer.Elem()
+       protoValue := reflect.New(protoReflectType)
+       descriptorMethod, ok := protoReflectTypePointer.MethodByName("Descriptor")
 
-    func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
-        protoName := name.Name
-        protoReflectTypePointer := proto.MessageType(protoName)
-        protoReflectType := protoReflectTypePointer.Elem()
-        protoValue := reflect.New(protoReflectType)
-        descriptorMethod, ok := protoReflectTypePointer.MethodByName("Descriptor")
+       if !ok {
+           return nil, errors.New("failed to get proto descriptor")
+       }
 
-        if !ok {
-            return nil, errors.New("failed to get proto descriptor")
-        }
-
-        descriptorValue := descriptorMethod.Func.Call([]reflect.Value{protoValue})
-        protoDescriptor := descriptorValue[0].Bytes()
-        return &protos.ProtoDescriptor{
-            Desc: protoDescriptor,
-        }, nil
+       descriptorValue := descriptorMethod.Func.Call([]reflect.Value{protoValue})
+       protoDescriptor := descriptorValue[0].Bytes()
+       return &protos.ProtoDescriptor{
+           Desc: protoDescriptor,
+       }, nil
     }
-    `````
+    ```
 
     It is important to note that ``proto`` refers to [golang/proto](https://github.com/golang/protobuf/tree/master/proto).
 
