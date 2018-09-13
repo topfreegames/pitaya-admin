@@ -25,7 +25,8 @@ def main():
 
 
 def get_last_tag(tags):
-    return max([(t.split('-')[0], t) for t in tags], key=lambda i: i[0])[1]
+    valid_tags = filter(lambda t: t != 'latest', tags)
+    return max([(t.split('-')[0], t) for t in valid_tags], key=lambda i: i[0])[1]
 
 
 if __name__ == "__main__":
