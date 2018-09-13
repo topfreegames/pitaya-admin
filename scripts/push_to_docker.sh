@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG=$($TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT)
+TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT
 
 docker build -t pitaya-admin .
 
