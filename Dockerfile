@@ -18,5 +18,6 @@ RUN apk update && apk add ca-certificates
 
 WORKDIR /app
 COPY --from=build-env /go/src/github.com/topfreegames/pitaya-admin/main /app
+COPY --from=build-env /go/src/github.com/topfreegames/pitaya-admin/config /app/config
 
 CMD ["./main", "start"]
