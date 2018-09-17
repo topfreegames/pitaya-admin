@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -35,15 +34,6 @@ func NewApp(
 }
 
 func (a *App) configureApp() {
-	a.Config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	a.Config.AutomaticEnv()
-	if a.Config.Get("pitayaadmin.routes.docs") == nil {
-		a.Config.SetDefault("pitayaadmin.routes.docs", "connectorremote.docs")
-	}
-	if a.Config.Get("pitayaadmin.routes.protos") == nil {
-		a.Config.SetDefault("pitayaadmin.routes.protos", "connectorremote.proto")
-	}
-	a.Config.SetDefault("pitayaadmin.request.readdeadline", "15s")
 	a.Router = a.getRouter()
 	a.configureServer()
 }
@@ -73,10 +63,10 @@ func (a *App) Init() {
 
 // GetRemoteDocsRoute gets the route for the autodoc handler
 func (a *App) GetRemoteDocsRoute() string {
-	return a.Config.GetString("pitayaadmin.routes.docs")
+	return a.Config.GetString("routes.docs")
 }
 
 // GetRemoteProtosRoute gets the route for the protos handler
 func (a *App) GetRemoteProtosRoute() string {
-	return a.Config.GetString("pitayaadmin.routes.protos")
+	return a.Config.GetString("routes.protos")
 }

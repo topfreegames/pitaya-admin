@@ -35,9 +35,8 @@ var startCmd = &cobra.Command{
 		})
 
 		cmdL.Info("starting pitaya admin")
-		conf := viper.New()
 
-		app, err := api.NewApp(bind, port, conf)
+		app, err := api.NewApp(bind, port, config)
 
 		if err != nil {
 			cmdL.Fatal(err)

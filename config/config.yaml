@@ -1,0 +1,5 @@
+routes:
+  protos: "connectorremote.proto"
+  docs: "connectorremote.docs"
+request:
+  readdeadline: 15s
