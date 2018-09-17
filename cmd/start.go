@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya-admin/api"
 	"github.com/topfreegames/pitaya/cluster"
@@ -61,10 +60,9 @@ var startCmd = &cobra.Command{
 				"grpc-port": rpcServerPort,
 			}
 
-			confs := viper.New()
-			confs.Set("pitaya.cluster.rpc.server.grpc.port", rpcServerPort)
+			config.Set("pitaya.cluster.rpc.server.grpc.port", rpcServerPort)
 
-			pitaya.Configure(isFrontend, svType, pitaya.Cluster, meta, confs)
+			pitaya.Configure(isFrontend, svType, pitaya.Cluster, meta, config)
 
 			bs := modules.NewETCDBindingStorage(pitaya.GetServer(), pitaya.GetConfig())
 			pitaya.RegisterModule(bs, "bindingsStorage")
@@ -82,7 +80,7 @@ var startCmd = &cobra.Command{
 			pitaya.SetRPCClient(gc)
 
 		} else {
-			pitaya.Configure(isFrontend, svType, pitaya.Cluster, map[string]string{})
+			pitaya.Configure(isFrontend, svType, pitaya.Cluster, map[string]string{}, config)
 		}
 
 		pitaya.Start()
