@@ -96,7 +96,7 @@ func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProt
 func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
 	protoRequest := &protos.ProtoName{Name: protoName}
 	replyMsg := &protos.ProtoDescriptor{}
-	rpcRoute := serverType + "." + serverType + protosRemoteRoute
+	rpcRoute := serverType + "." + protosRemoteRoute
 
 	err := pitaya.RPC(context.Background(), rpcRoute, replyMsg, protoRequest)
 

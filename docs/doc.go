@@ -12,7 +12,7 @@ import (
 func GetDocumentationForServerType(serverType, docsRemoteRoute string, flag bool) (map[string]interface{}, error) {
 	var ret map[string]interface{}
 	responseProto := &protos.Doc{}
-	route := serverType + "." + serverType + docsRemoteRoute
+	route := serverType + "." + docsRemoteRoute
 
 	err := pitaya.RPC(context.Background(), route, responseProto, &protos.DocMsg{GetProtos: flag})
 

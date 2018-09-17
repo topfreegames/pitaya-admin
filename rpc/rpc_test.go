@@ -44,8 +44,8 @@ func TestCreateRPCMessagesFromProto(t *testing.T) {
 		protosRemoteRoute string
 		err               error
 	}{
-		{"success", r, "remote.docs", "remote.proto", nil},
-		{"fail no remote", r2, "remote.docs", "remote.proto", constants.ErrNoInputDocForMethod},
+		{"success", r, "connectorremote.docs", "connectorremote.proto", nil},
+		{"fail no remote", r2, "connectorremote.docs", "connectorremote.proto", constants.ErrNoInputDocForMethod},
 	}
 
 	for _, table := range tables {
