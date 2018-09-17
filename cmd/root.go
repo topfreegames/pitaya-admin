@@ -9,10 +9,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// ConfigFile is the configuration file used for running a command
-var ConfigFile string
+var configFile string
 
-// Config is the app configuration
 var config *viper.Viper
 
 // RootCmd is the root command
@@ -33,7 +31,7 @@ func Execute(cmd *cobra.Command) {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVarP(
-		&ConfigFile, "config", "c", "./config/config.yaml",
+		&configFile, "config", "c", "./config/config.yaml",
 		"config file",
 	)
 
@@ -44,15 +42,16 @@ func initConfig() {
 	config = viper.New()
 	config.AddConfigPath("./config/")
 	config.SetConfigType("yaml")
-	if ConfigFile != "" {
-		viper.SetConfigFile(ConfigFile)
+	if configFile != "" {
+		viper.SetConfigFile(configFile)
 	}
 	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	config.SetEnvPrefix("pitayaadmin")
 	config.AutomaticEnv()
 
-	if err := config.ReadInConfig(); err == nil {
-		fmt.Printf("Using config file: %s", config.ConfigFileUsed())
+	if err := config.ReadInConfig(); err != nil {
+		fmt.Printf("Config file %s failed to load: %s.\n", configFile, err.Error())
+		panic("Failed to load config file")
 	}
 
 }

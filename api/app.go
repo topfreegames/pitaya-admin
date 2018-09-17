@@ -35,6 +35,9 @@ func NewApp(
 
 func (a *App) configureApp() {
 	a.Router = a.getRouter()
+	a.Config.SetDefault("routes.docs", "connectorremote.docs")
+	a.Config.SetDefault("routes.protos", "connectorremote.proto")
+	a.Config.SetDefault("request.readdeadline", "15s")
 	a.configureServer()
 }
 
