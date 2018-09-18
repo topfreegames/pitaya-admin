@@ -81,6 +81,10 @@ Returns server auto documentation given its type. Target server must implement p
 
 - **URL Params**
 
+  **Required:**
+
+  `type=[server type]`
+
   **Optional:**
 
   `methodtype=[either "remote" or "handler"]`
@@ -94,10 +98,6 @@ Returns server auto documentation given its type. Target server must implement p
   `getProtos=["1"]`
 
   Specifies if the documentation will have protobuff message names when set to 1.
-
-  **Required:**
-
-  `type=[server type]`
 
 * **Response Example**
 
@@ -245,9 +245,9 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
            Desc: protoDescriptor,
        }, nil
     }
-    ```
+  ```
 
-    It is important to note that ``proto`` refers to [golang/proto](https://github.com/golang/protobuf/tree/master/proto).
+  It is important to note that `proto` refers to the protobuf library you used to compile `.proto` files.
 
 ## **Send Push**
 
@@ -277,6 +277,26 @@ Sends a push notification to users in a given user list
   `{"success" : true}`
 
   If the message was sent or an error otherwise.
+
+# Configuring Pitaya Admin
+
+In order for Pitaya Admin to work, the following configuration must be set using environment variables or passing it through a `.yaml` configuration file.
+
+Example yaml config:
+
+```yaml
+routes:
+  protos: "connectorremote.proto"
+  docs: "connectorremote.docs"
+request:
+  readdeadline: 15s
+```
+
+- `routes.protos` is the protobuf descriptor remote route
+- `routes.docs` is the documentation remote route
+- `request.readdeadline` is the websocket connection deadline
+
+If environment variables are used, their prefix must be `PITAYAADMIN`. It is important to note that you also have to setup [Pitaya configuration](https://pitaya.readthedocs.io/en/latest/configuration.html) according to your needs.
 
 # License
 
