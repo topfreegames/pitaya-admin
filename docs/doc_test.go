@@ -19,8 +19,8 @@ func TestGetDocumentationForServerType(t *testing.T) {
 		docsRemoteRoute string
 		err             bool
 	}{
-		{"success", "connector", "remote.docs", false},
-		{"fail_no_route_in_server", "room", "remote.docs", true},
+		{"success", "connector", "connectorremote.docs", false},
+		{"fail_no_route_in_server", "room", "connectorremote.docs", true},
 		{"fail_wrong_route", "connector", "doc.docs", true},
 	}
 
@@ -52,8 +52,8 @@ func TestGetDocForHandlersOrRemotes(t *testing.T) {
 		handlerOrRemote string
 	}{
 		// Fail scenarios are tested in above function
-		{"succes_handler", "connector", "remote.docs", "handler"},
-		{"succes_remote", "connector", "remote.docs", "remote"},
+		{"succes_handler", "connector", "connectorremote.docs", "handler"},
+		{"succes_remote", "connector", "connectorremote.docs", "remote"},
 	}
 
 	for _, table := range tables {
@@ -78,8 +78,8 @@ func TestGetMethodDoc(t *testing.T) {
 		route           string
 		docsRemoteRoute string
 	}{
-		{"success", "connector", "remote", "connector.connectorremote.docs", "remote.docs"},
-		{"fail", "connector", "remote", "connector.getsessiondata", "remote.docs"},
+		{"success", "connector", "remote", "connector.connectorremote.docs", "connectorremote.docs"},
+		{"fail", "connector", "remote", "connector.getsessiondata", "connectorremote.docs"},
 	}
 
 	for _, table := range tables {

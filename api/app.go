@@ -34,10 +34,10 @@ func NewApp(
 }
 
 func (a *App) configureApp() {
-	a.Config.SetDefault("pitayaadmin.request.readdeadline", "15s")
-	a.Config.SetDefault("pitayaadmin.routes.docs", "remote.docs")
-	a.Config.SetDefault("pitayaadmin.routes.protos", "remote.proto")
 	a.Router = a.getRouter()
+	a.Config.SetDefault("routes.docs", "connectorremote.docs")
+	a.Config.SetDefault("routes.protos", "connectorremote.proto")
+	a.Config.SetDefault("request.readdeadline", "15s")
 	a.configureServer()
 }
 
@@ -66,10 +66,10 @@ func (a *App) Init() {
 
 // GetRemoteDocsRoute gets the route for the autodoc handler
 func (a *App) GetRemoteDocsRoute() string {
-	return a.Config.GetString("pitayaadmin.routes.docs")
+	return a.Config.GetString("routes.docs")
 }
 
 // GetRemoteProtosRoute gets the route for the protos handler
 func (a *App) GetRemoteProtosRoute() string {
-	return a.Config.GetString("pitayaadmin.routes.protos")
+	return a.Config.GetString("routes.protos")
 }

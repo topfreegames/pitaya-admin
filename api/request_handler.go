@@ -22,7 +22,7 @@ type RequestHandler struct {
 func NewRequestHandler(a *App) *RequestHandler {
 	m := &RequestHandler{
 		App:          a,
-		readDeadLine: a.Config.GetDuration("pitayaadmin.request.readdeadline"),
+		readDeadLine: a.Config.GetDuration("request.readdeadline"),
 	}
 	return m
 }

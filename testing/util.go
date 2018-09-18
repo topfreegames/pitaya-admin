@@ -19,6 +19,12 @@ var IsConf bool
 func ConfApp() {
 
 	conf := viper.New()
+
+	// set configs for test
+	conf.SetDefault("routes.docs", "connectorremote.docs")
+	conf.SetDefault("routes.protos", "connectorremote.proto")
+	conf.SetDefault("request.readdeadline", "15s")
+
 	TestApp, _ = api.NewApp("0.0.0.0", 8000, conf)
 
 	TestApp.Init()
