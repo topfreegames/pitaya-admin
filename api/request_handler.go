@@ -30,6 +30,9 @@ func NewRequestHandler(a *App) *RequestHandler {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 // ServeHTTP creates a web socket connection with the user
@@ -45,6 +48,7 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+		logger.Log.Info("Client disconnected")
 		ws.Close()
 	}()
 
@@ -68,7 +72,7 @@ func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return err
 		}
-		ws.WriteMessage(websocket.BinaryMessage, byteMessage)
+		ws.WriteMessage(websocket.TextMessage, byteMessage)
 		return nil
 	})
 
