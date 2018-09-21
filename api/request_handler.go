@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -16,6 +17,7 @@ import (
 type RequestHandler struct {
 	App          *App
 	readDeadLine time.Duration
+	whiteList    []string
 }
 
 // NewRequestHandler creates a new request handler
@@ -23,6 +25,7 @@ func NewRequestHandler(a *App) *RequestHandler {
 	m := &RequestHandler{
 		App:          a,
 		readDeadLine: a.Config.GetDuration("request.readdeadline"),
+		whiteList:    a.Config.GetStringSlice("request.whitelist"),
 	}
 	return m
 }
@@ -30,15 +33,23 @@ func NewRequestHandler(a *App) *RequestHandler {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
 }
 
 // ServeHTTP creates a web socket connection with the user
 func (s *RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 	pitayaAddress := v.Get("address")
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		if strings.Contains(r.Host, "127.0.0.1:") {
+			return true
+		}
+		for _, a := range s.whiteList {
+			if a == r.Host {
+				return true
+			}
+		}
+		return false
+	}
 	ws, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {

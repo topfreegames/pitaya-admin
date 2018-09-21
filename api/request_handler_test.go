@@ -19,7 +19,6 @@ type Message struct {
 }
 
 func TestRequestHandler(t *testing.T) {
-	t.Parallel()
 
 	if !pt.IsConf {
 		pt.ConfApp()

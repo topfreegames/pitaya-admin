@@ -3,3 +3,5 @@ routes:
   docs: "connectorremote.docs"
 request:
   readdeadline: 1m
+  whitelist:
+    - localhost:8000
