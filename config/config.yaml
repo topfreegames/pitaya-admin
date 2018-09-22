@@ -2,4 +2,6 @@ routes:
   protos: "connectorremote.proto"
   docs: "connectorremote.docs"
 request:
-  readdeadline: 15s
+  readdeadline: 1m
+  whitelist:
+    - localhost:8000

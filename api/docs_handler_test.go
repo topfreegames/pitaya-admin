@@ -34,7 +34,7 @@ func TestGetDocs(t *testing.T) {
 			asserts: func(response *httptest.ResponseRecorder) {
 				b := response.Body.String()
 				assert.Equal(t, http.StatusBadRequest, response.Code)
-				assert.Equal(t, `{"success":false, "message":"at least server type must be specified", "reason": "no server type chosen for getting autodoc"}`, b)
+				assert.Equal(t, `{"success":false, "message":"at least server type must be specified", "reason": "no server type chosen"}`, b)
 			},
 		},
 		"test_get_docs_by_type_but_sv_does_not_exists": {

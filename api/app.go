@@ -38,6 +38,7 @@ func (a *App) configureApp() {
 	a.Config.SetDefault("routes.docs", "connectorremote.docs")
 	a.Config.SetDefault("routes.protos", "connectorremote.proto")
 	a.Config.SetDefault("request.readdeadline", "15s")
+	a.Config.SetDefault("request.whitelist", []string{"0.0.0.0:8000"})
 	a.configureServer()
 }
 
