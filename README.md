@@ -247,7 +247,7 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
     }
   ```
 
-  It is important to note that `proto` refers to the protobuf library you used to compile `.proto` files.
+  It is important to note that `proto` refers to the protobuf library you used to compile `.proto` files. Also, this is the default remote, if your pitaya project uses protobuf import such as [this](./examples/protos/protoB.proto), please refer to the [connector example](./examples/services/connector.go) remote. 
 
 ## **Send Push**
 
@@ -289,12 +289,15 @@ routes:
   protos: "connectorremote.proto"
   docs: "connectorremote.docs"
 request:
+  whitelist:
+    - localhost:8080
   readdeadline: 15s
 ```
 
 - `routes.protos` is the protobuf descriptor remote route
 - `routes.docs` is the documentation remote route
 - `request.readdeadline` is the websocket connection deadline
+- `request.whitelist` is the accepted origins slice for the websocket connection 
 
 If environment variables are used, their prefix must be `PITAYAADMIN`. It is important to note that you also have to setup [Pitaya configuration](https://pitaya.readthedocs.io/en/latest/configuration.html) according to your needs.
 

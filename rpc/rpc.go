@@ -94,11 +94,11 @@ func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProt
 }
 
 func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
-	protoRequest := &protos.ProtoName{Name: protoName}
+	protoRequestForDepsuest := &protos.ProtoName{Name: protoName}
 	replyMsg := &protos.ProtoDescriptor{}
 	rpcRoute := serverType + "." + protosRemoteRoute
 
-	err := pitaya.RPC(context.Background(), rpcRoute, replyMsg, protoRequest)
+	err := pitaya.RPC(context.Background(), rpcRoute, replyMsg, protoRequestForDepsuest)
 
 	if err != nil {
 		return nil, err
@@ -109,8 +109,35 @@ func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Mes
 	if err != nil {
 		return nil, err
 	}
+	depsArr := []*desc.FileDescriptor{}
 
-	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto)
+	// This checks if given proto has deps, if positive, get all deps in order to build it
+	for _, dep := range fileDescriptorProto.GetDependency() {
+		replyMsgForDeps := &protos.ProtoDescriptor{}
+		protoRequestForDeps := &protos.ProtoName{Name: dep}
+
+		err = pitaya.RPC(context.Background(), rpcRoute, replyMsgForDeps, protoRequestForDeps)
+
+		if err != nil {
+			return nil, err
+		}
+
+		depDescriptorProto, err := unpackDescriptor(replyMsgForDeps.Desc)
+
+		if err != nil {
+			return nil, err
+		}
+
+		depDescriptor, err := desc.CreateFileDescriptor(depDescriptorProto)
+
+		if err != nil {
+			return nil, err
+		}
+
+		depsArr = append(depsArr, depDescriptor)
+	}
+
+	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto, depsArr...)
 
 	if err != nil {
 		return nil, err
