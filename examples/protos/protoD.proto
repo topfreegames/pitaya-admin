@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package protos;
+
+import "protoE.proto";
+
+message LastMessage {
+    string last = 1;
+    MessageE final = 2;
+}

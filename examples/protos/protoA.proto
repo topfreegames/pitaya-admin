@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package protos;
 
+import "protoC.proto";
+
 message ImportedMessage {
     string ImportedMessage = 1;
+    ThirdMessage num = 2;
 }
