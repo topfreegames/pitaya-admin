@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package protos;
-
-message MessageE {
-   int32 eNumber = 1; 
-}
