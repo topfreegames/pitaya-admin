@@ -93,12 +93,11 @@ func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProt
 	return fileDescriptorProto, nil
 }
 
-func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
-	protoRequest := &protos.ProtoName{Name: protoName}
+func retrieveDescriptor(protoName, protosRemoteRoute string) (*desc.FileDescriptor, error) {
 	replyMsg := &protos.ProtoDescriptor{}
-	rpcRoute := serverType + "." + protosRemoteRoute
+	protoRequest := &protos.ProtoName{Name: protoName}
 
-	err := pitaya.RPC(context.Background(), rpcRoute, replyMsg, protoRequest)
+	err := pitaya.RPC(context.Background(), protosRemoteRoute, replyMsg, protoRequest)
 
 	if err != nil {
 		return nil, err
@@ -110,7 +109,49 @@ func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Mes
 		return nil, err
 	}
 
-	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto)
+	depsArr := []*desc.FileDescriptor{}
+
+	for _, dep := range fileDescriptorProto.GetDependency() {
+		replyMsgForDeps := &protos.ProtoDescriptor{}
+		protoRequestForDeps := &protos.ProtoName{Name: dep}
+		err = pitaya.RPC(context.Background(), protosRemoteRoute, replyMsgForDeps, protoRequestForDeps)
+
+		if err != nil {
+			return nil, err
+		}
+
+		depDescriptorProto, err := unpackDescriptor(replyMsgForDeps.Desc)
+
+		if err != nil {
+			return nil, err
+		}
+
+		transitiveDepArr := []*desc.FileDescriptor{}
+
+		for _, transitiveDep := range depDescriptorProto.GetDependency() {
+			transitiveDepDescriptor, err := retrieveDescriptor(transitiveDep, protosRemoteRoute)
+			if err != nil {
+				return nil, err
+			}
+			transitiveDepArr = append(transitiveDepArr, transitiveDepDescriptor)
+		}
+
+		depDescriptor, err := desc.CreateFileDescriptor(depDescriptorProto, transitiveDepArr...)
+
+		if err != nil {
+			return nil, err
+		}
+
+		depsArr = append(depsArr, depDescriptor)
+	}
+
+	fileDescriptor, err := desc.CreateFileDescriptor(fileDescriptorProto, depsArr...)
+	return fileDescriptor, err
+}
+
+func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
+	rpcRoute := serverType + "." + protosRemoteRoute
+	fileDescriptor, err := retrieveDescriptor(protoName, rpcRoute)
 
 	if err != nil {
 		return nil, err

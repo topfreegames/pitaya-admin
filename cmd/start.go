@@ -72,7 +72,7 @@ var startCmd = &cobra.Command{
 				cmdL.Fatal(err)
 			}
 
-			gc, err := cluster.NewGRPCClient(pitaya.GetConfig(), pitaya.GetServer(), pitaya.GetMetricsReporters(), bs)
+			gc, err := cluster.NewGRPCClient(pitaya.GetConfig(), pitaya.GetServer(), pitaya.GetMetricsReporters(), bs, cluster.NewConfigInfoRetriever(pitaya.GetConfig()))
 			if err != nil {
 				cmdL.Fatal(err)
 			}

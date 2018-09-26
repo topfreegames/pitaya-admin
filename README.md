@@ -53,6 +53,8 @@ Establishes a websocket connection with pitaya admin that can be used to send re
 
   `address=[pitaya server address]`
 
+  You also need to add origins to `request.whitelist` configuration. When upgrading the connection, pitaya admin will only accept requests incoming from hosts specified in the whitelist.
+
 - **Data Params**
 
   After the websocket connection is set, pitaya admin will listen to requests in the following structure:
@@ -107,22 +109,22 @@ Returns server auto documentation given its type. Target server must implement p
 
   As stated above, in order for documentation routes to work, you will need to implement a remote for pitaya's auto documentation. A simple example is presented below.
 
-  ```golang
-      func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
-          d, err := pitaya.Documentation(flag.GetGetProtos())
+```golang
+func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+    d, err := pitaya.Documentation(flag.GetGetProtos())
 
-          if err != nil {
-              return nil, err
-          }
-          doc, err := json.Marshal(d)
+    if err != nil {
+        return nil, err
+    }
+    doc, err := json.Marshal(d)
 
-          if err != nil {
-              return nil, err
-          }
+    if err != nil {
+        return nil, err
+    }
 
-          return &protos.Doc{Doc: string(doc)}, nil
-  }
-  ```
+    return &protos.Doc{Doc: string(doc)}, nil
+}
+```
 
   The boolean inside `flag` passed to `pitaya.Documentation` specifies if the documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
 
@@ -179,7 +181,7 @@ Returns a json array with servers information
 
 ## **RPC**
 
-Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc feature and a remote that provides protobuff descriptors using reflection.
+Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc feature and a remote that provides protobuff descriptors.
 
 - **URL**
 
@@ -210,44 +212,37 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
 
 - **Requirements**
 
-  As stated, in order to RPC work properly, you will need a remote that provides protobuff descriptors via reflection **and** documentation's remote. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example is presented below
+  As stated, in order to RPC work properly, you will need a remote that provides protobuff descriptors via reflection **and** documentation's remote, both functions are available on pitaya, you only need to expose them on a remote. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example is presented below
 
-  ```golang
-  func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
-  		d, err := pitaya.Documentation(flag.GetGetProtos())
+```golang
+func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
+    d, err := pitaya.Documentation(flag.GetGetProtos())
 
-  		if err != nil {
-  			return nil, err
-  		}
-  		doc, err := json.Marshal(d)
-
-  		if err != nil {
-  			return nil, err
-  		}
-
-  		return &protos.Doc{Doc: string(doc)}, nil
-  }
-
-  func (c *ConnectorRemote) Proto(ctx context.Context, name *protos.ProtoName) (*protos.ProtoDescriptor, error) {
-       protoName := name.Name
-       protoReflectTypePointer := proto.MessageType(protoName)
-       protoReflectType := protoReflectTypePointer.Elem()
-       protoValue := reflect.New(protoReflectType)
-       descriptorMethod, ok := protoReflectTypePointer.MethodByName("Descriptor")
-
-       if !ok {
-           return nil, errors.New("failed to get proto descriptor")
-       }
-
-       descriptorValue := descriptorMethod.Func.Call([]reflect.Value{protoValue})
-       protoDescriptor := descriptorValue[0].Bytes()
-       return &protos.ProtoDescriptor{
-           Desc: protoDescriptor,
-       }, nil
+  	if err != nil {
+  		return nil, err
     }
-  ```
+  	doc, err := json.Marshal(d)
 
-  It is important to note that `proto` refers to the protobuf library you used to compile `.proto` files.
+  	if err != nil {
+  		return nil, err
+  	}
+
+  	return &protos.Doc{Doc: string(doc)}, nil
+}
+
+func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) (*protos.ProtoDescriptor, error) {
+    protoDescriptor, err := pitaya.Descriptor(message.GetName())
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &protos.ProtoDescriptor{
+        Desc: protoDescriptor,
+    }, nil
+}
+```
+
 
 ## **Send Push**
 
@@ -289,12 +284,15 @@ routes:
   protos: "connectorremote.proto"
   docs: "connectorremote.docs"
 request:
+  whitelist:
+    - localhost:8080
   readdeadline: 15s
 ```
 
 - `routes.protos` is the protobuf descriptor remote route
 - `routes.docs` is the documentation remote route
 - `request.readdeadline` is the websocket connection deadline
+- `request.whitelist` is the accepted origins slice for the websocket connection 
 
 If environment variables are used, their prefix must be `PITAYAADMIN`. It is important to note that you also have to setup [Pitaya configuration](https://pitaya.readthedocs.io/en/latest/configuration.html) according to your needs.
 

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package protos;
+
+import "protoA.proto";
+
+message TestMessage {
+    ImportedMessage payload = 1;
+}

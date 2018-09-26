@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/topfreegames/pitaya"
@@ -78,9 +79,21 @@ func (c *ConnectorRemote) RemoteFunc(ctx context.Context, msg *protos.RPCMsg) (*
 	}, nil
 }
 
+// RemoteWithImports is a function that will be called remotely with imported proto messages
+func (c *ConnectorRemote) RemoteWithImports(ctx context.Context, msg *protos.TestMessage) (*protos.RPCRes, error) {
+	return &protos.RPCRes{
+		Msg: msg.Payload.ImportedMessage,
+	}, nil
+}
+
 // Proto is a function that will be called remotely to get the game proto specified by name.doc
 func (c *ConnectorRemote) Proto(ctx context.Context, name *pitayaprotos.ProtoName) (*pitayaprotos.ProtoDescriptor, error) {
 	protoName := name.Name
+	if strings.HasSuffix(protoName, ".proto") {
+		return &pitayaprotos.ProtoDescriptor{
+			Desc: proto.FileDescriptor(protoName),
+		}, nil
+	}
 	protoReflectTypePointer := proto.MessageType(protoName)
 	protoReflectType := protoReflectTypePointer.Elem()
 	protoValue := reflect.New(protoReflectType)

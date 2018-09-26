@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package protos;
+
+import "protoD.proto";
+
+message ThirdMessage {
+    LastMessage imported = 1;
+}

@@ -49,10 +49,15 @@ func (s *PushToUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pitaya.SendPushToUsers(push.Route, push.Message, push.Uids, push.FrontendType)
+	failedUids, err := pitaya.SendPushToUsers(push.Route, push.Message, push.Uids, push.FrontendType)
 
 	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to send push to user", err)
+		failedUidsJSON, err := json.Marshal(failedUids)
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, "failed trying to marshal uids", err)
+			return
+		}
+		WriteErrorWithJSON(w, http.StatusInternalServerError, failedUidsJSON, "failed to send push to users")
 		return
 	}
 
@@ -97,10 +102,15 @@ func (s *KickUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pitaya.SendKickToUsers(kick.Uids, kick.FrontendType)
+	failedUids, err := pitaya.SendKickToUsers(kick.Uids, kick.FrontendType)
 
 	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to kick user", err)
+		failedUidsJSON, err := json.Marshal(failedUids)
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, "failed trying to marshal uids", err)
+			return
+		}
+		WriteErrorWithJSON(w, http.StatusInternalServerError, failedUidsJSON, "failed to send push to users")
 		return
 	}
 

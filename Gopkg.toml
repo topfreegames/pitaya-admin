@@ -31,7 +31,7 @@
 
 [[constraint]]
   name = "github.com/topfreegames/pitaya"
-  branch = "master"
+  revision = "33c6262c8700f0afce6c5c05495b64a1abce7422"
 
 [prune]
   go-tests = true

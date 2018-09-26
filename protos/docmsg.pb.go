@@ -3,7 +3,7 @@
 
 package protos
 
-import proto "github.com/golang/protobuf/proto"
+import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 
@@ -18,12 +18,11 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type DocMsg struct {
 	GetProtos            bool     `protobuf:"varint,1,opt,name=getProtos,proto3" json:"getProtos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
@@ -31,7 +30,7 @@ func (m *DocMsg) Reset()         { *m = DocMsg{} }
 func (m *DocMsg) String() string { return proto.CompactTextString(m) }
 func (*DocMsg) ProtoMessage()    {}
 func (*DocMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_docmsg_4c1f867bd5fcec48, []int{0}
+	return fileDescriptor_docmsg_4bb0b22ee8040766, []int{0}
 }
 func (m *DocMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -95,9 +94,6 @@ func (m *DocMsg) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -115,9 +111,6 @@ func (m *DocMsg) Size() (n int) {
 	_ = l
 	if m.GetProtos {
 		n += 2
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -196,7 +189,6 @@ func (m *DocMsg) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -311,14 +303,14 @@ var (
 	ErrIntOverflowDocmsg   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("docmsg.proto", fileDescriptor_docmsg_4c1f867bd5fcec48) }
+func init() { proto.RegisterFile("docmsg.proto", fileDescriptor_docmsg_4bb0b22ee8040766) }
 
-var fileDescriptor_docmsg_4c1f867bd5fcec48 = []byte{
+var fileDescriptor_docmsg_4bb0b22ee8040766 = []byte{
 	// 95 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0xc9, 0x4f, 0xce,
 	0x2d, 0x4e, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x03, 0x53, 0xc5, 0x4a, 0x6a, 0x5c,
 	0x6c, 0x2e, 0xf9, 0xc9, 0xbe, 0xc5, 0xe9, 0x42, 0x32, 0x5c, 0x9c, 0xe9, 0xa9, 0x25, 0x01, 0x60,
 	0x61, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x8e, 0x20, 0x84, 0x80, 0x93, 0xc0, 0x89, 0x47, 0x72, 0x8c,
-	0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe3, 0xb1, 0x1c, 0x43, 0x12, 0xc4, 0x04,
-	0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf0, 0x6c, 0x28, 0x48, 0x58, 0x00, 0x00, 0x00,
+	0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe1, 0xb1, 0x1c, 0x43, 0x12, 0xc4, 0x04,
+	0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x0e, 0x1a, 0x24, 0x4e, 0x58, 0x00, 0x00, 0x00,
 }
