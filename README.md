@@ -53,7 +53,7 @@ Establishes a websocket connection with pitaya admin that can be used to send re
 
   `address=[pitaya server address]`
 
-  You also need to add origins to `request.whitelist` configuration, when upgrading the connection, pitaya admin will only accept requests incoming from hosts specified in the whitelist.
+  You also need to add origins to `request.whitelist` configuration. When upgrading the connection, pitaya admin will only accept requests incoming from hosts specified in the whitelist.
 
 - **Data Params**
 
@@ -243,7 +243,6 @@ func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) 
 }
 ```
 
-  It is important to note that `proto` refers to the protobuf library you used to compile `.proto` files. Also, this is the default remote, if your pitaya project uses protobuf import such as [this](./examples/protos/protoB.proto), please refer to the [connector example](./examples/services/connector.go) remote. 
 
 ## **Send Push**
 

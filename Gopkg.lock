@@ -362,8 +362,7 @@
   version = "v1.2.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4e822d9f850127fb29f2dadfe403a0b5da875015de42b36dbe459d1a06e9d693"
+  digest = "1:2ef4f1f5d273118792748dad0ed7cf978d3922cfa1d457f9caf03240425d95b4"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -402,7 +401,7 @@
     "util/compression",
   ]
   pruneopts = "UT"
-  revision = "cee3667e1c999cbc9dfcd09a95402b204c7dffc5"
+  revision = "33c6262c8700f0afce6c5c05495b64a1abce7422"
 
 [[projects]]
   branch = "master"
