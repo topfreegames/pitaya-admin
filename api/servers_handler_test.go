@@ -35,7 +35,7 @@ func TestGetServerList(t *testing.T) {
 			asserts: func(response *httptest.ResponseRecorder) {
 				b := response.Body.String()
 				assert.Equal(t, http.StatusOK, response.Code)
-				assert.Regexp(t, regexp.MustCompile(`\A\{"success" : true, "response":(\[\{"id":"([a-z0-9-]*)*","type":"([a-z0-9-._]*)","metadata":\{(.)*\},"frontend":(true|false)\},*)+\]\}`), b)
+				assert.Regexp(t, regexp.MustCompile(`\A\{"success" : true, "response":(\[\{"id":"([a-z0-9-]*)*","type":"([a-z0-9-._]*)","metadata":\{(.)*\},"frontend":(true|false),"hostname":"(.)*"\},*)+\]\}`), b)
 			},
 		},
 		"test_get_servers_type": {
