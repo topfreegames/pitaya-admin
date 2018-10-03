@@ -362,7 +362,7 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:2ef4f1f5d273118792748dad0ed7cf978d3922cfa1d457f9caf03240425d95b4"
+  digest = "1:d77643f66f77cc5f9d6986f0a3dadc100529565cebcbe4037e675823c91edbf9"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -401,7 +401,8 @@
     "util/compression",
   ]
   pruneopts = "UT"
-  revision = "33c6262c8700f0afce6c5c05495b64a1abce7422"
+  revision = "08d1d52398eeeea7abfd636acbe3f333015fb46b"
+  version = "0.4.1"
 
 [[projects]]
   branch = "master"
@@ -549,7 +550,6 @@
     "github.com/topfreegames/pitaya/route",
     "github.com/topfreegames/pitaya/serialize/json",
     "github.com/topfreegames/pitaya/serialize/protobuf",
-    "github.com/topfreegames/pitaya/session",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
