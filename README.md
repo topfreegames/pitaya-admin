@@ -71,7 +71,7 @@ Establishes a websocket connection with pitaya admin that can be used to send re
 
 ## **Documentation**
 
-Returns server auto documentation given its type. Target server must implement pitaya's auto documentation remote.
+Returns server auto documentation given its type. Target server must implement pitaya's auto documentation remote. The documentation remote is usefull on servers that have many handlers and remotes.
 
 - **URL**
 
@@ -99,7 +99,7 @@ Returns server auto documentation given its type. Target server must implement p
 
   `getProtos=["1"]`
 
-  Specifies if the documentation will have protobuff message names when set to 1.
+  Specifies if the documentation will have protobuf message names when set to 1.
 
 * **Response Example**
 
@@ -107,7 +107,7 @@ Returns server auto documentation given its type. Target server must implement p
 
 * **Requirements**
 
-  As stated above, in order for documentation routes to work, you will need to implement a remote for pitaya's auto documentation. A simple example is presented below.
+  As stated above, in order for documentation routes to work, you will need to implement on the server a [remote](https://pitaya.readthedocs.io/en/latest/API.html#remotes) for pitaya's auto documentation. If you want to be able to retrieve the documentation for a server type, lets say connector, you have to create the following remote on the connector. 
 
 ```golang
 func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
@@ -125,8 +125,7 @@ func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*proto
     return &protos.Doc{Doc: string(doc)}, nil
 }
 ```
-
-  The boolean inside `flag` passed to `pitaya.Documentation` specifies if the documentation will have protobuff message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
+  The boolean inside `flag` passed to `pitaya.Documentation` specifies if the documentation will have protobuf message names. Note that in order to pitaya admin RPC to work, documentation **must** have protos name.
 
 ## **Kick Users**
 
@@ -181,7 +180,7 @@ Returns a json array with servers information
 
 ## **RPC**
 
-Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc feature and a remote that provides protobuff descriptors.
+Sends a RPC to a pitaya server. Target server must implement [remotes](https://pitaya.readthedocs.io/en/latest/API.html#remotes) for protobuf descriptors **and** auto documentation.
 
 - **URL**
 
@@ -202,7 +201,7 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
       Meta           Remote's args data serialized
   ```
 
-  Since pitaya's RPC methods take protos as an argument and return protos as a response, pitaya admin uses reflection alongside with pitaya's autodoc feature to build dynamic messages and send them to the server
+  Since pitaya's RPC methods take protos as an argument and return protos as a response, pitaya admin uses reflection alongside with pitaya's autodoc feature to build dynamic messages and send them to the server.
 
 - **Response Example**
 
@@ -212,22 +211,23 @@ Sends a RPC to a pitaya server. Target server must implement pitaya's autodoc fe
 
 - **Requirements**
 
-  As stated, in order to RPC work properly, you will need a remote that provides protobuff descriptors via reflection **and** documentation's remote, both functions are available on pitaya, you only need to expose them on a remote. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example is presented below
+  As stated, in order to RPC work properly, you will need a remote that provides protobuf descriptors via reflection **and** the documentation's remote, both functions are available on pitaya, you only need to expose them on a remote on the servers that you want to be able to send RPC via pitaya admin. This allows pitaya-admin to work with RPCs without any proto specification at compile time. An remote example for, lets say, send RPC to servers of type connector is presented below
 
 ```golang
 func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
     d, err := pitaya.Documentation(flag.GetGetProtos())
 
-  	if err != nil {
-  		return nil, err
+    if err != nil {
+        return nil, err
     }
-  	doc, err := json.Marshal(d)
 
-  	if err != nil {
-  		return nil, err
-  	}
+    doc, err := json.Marshal(d)
 
-  	return &protos.Doc{Doc: string(doc)}, nil
+    if err != nil {
+        return nil, err
+    }
+
+    return &protos.Doc{Doc: string(doc)}, nil
 }
 
 func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) (*protos.ProtoDescriptor, error) {
@@ -243,6 +243,7 @@ func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) 
 }
 ```
 
+All of the used protobuf messages can be found at [pitaya-protos](https://github.com/topfreegames/pitaya-protos). You can implement the remotes on your own components as shown above, or you can use the components defined at the package remotes.
 
 ## **Send Push**
 
@@ -281,20 +282,20 @@ Example yaml config:
 
 ```yaml
 routes:
-  protos: "connectorremote.proto"
-  docs: "connectorremote.docs"
+  protos: "protoRemote.proto"
+  docs: "docRemote.docs"
 request:
   whitelist:
     - localhost:8080
-  readdeadline: 15s
+  readdeadline: 5m
 ```
 
-- `routes.protos` is the protobuf descriptor remote route
-- `routes.docs` is the documentation remote route
+- `routes.protos` is the protobuf descriptor remote route without server type.
+- `routes.docs` is the documentation remote route without server type.
 - `request.readdeadline` is the websocket connection deadline
 - `request.whitelist` is the accepted origins slice for the websocket connection 
 
-If environment variables are used, their prefix must be `PITAYAADMIN`. It is important to note that you also have to setup [Pitaya configuration](https://pitaya.readthedocs.io/en/latest/configuration.html) according to your needs.
+If environment variables are used, their prefix must be `PITAYAADMIN`. It is important to note that you also have to setup [Pitaya configuration](https://pitaya.readthedocs.io/en/latest/configuration.html) such as etcd configs according to your needs.
 
 # License
 
