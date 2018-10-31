@@ -217,16 +217,17 @@ Sends a RPC to a pitaya server. Target server must implement [remotes](https://p
 func (c *ConnectorRemote) Docs(ctx context.Context, flag *protos.DocMsg) (*protos.Doc, error) {
     d, err := pitaya.Documentation(flag.GetGetProtos())
 
-  	if err != nil {
-  		return nil, err
+    if err != nil {
+        return nil, err
     }
-  	doc, err := json.Marshal(d)
 
-  	if err != nil {
-  		return nil, err
-  	}
+    doc, err := json.Marshal(d)
 
-  	return &protos.Doc{Doc: string(doc)}, nil
+    if err != nil {
+        return nil, err
+    }
+
+    return &protos.Doc{Doc: string(doc)}, nil
 }
 
 func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) (*protos.ProtoDescriptor, error) {
@@ -242,7 +243,7 @@ func (c *ConnectorRemote) Proto(ctx context.Context, message *protos.ProtoName) 
 }
 ```
 
-All of the used protobuf messages can be found at [pitaya-protos](https://github.com/topfreegames/pitaya-protos).
+All of the used protobuf messages can be found at [pitaya-protos](https://github.com/topfreegames/pitaya-protos). You can implement the remotes on your own components as shown above, or you can use the components defined at the package remotes.
 
 ## **Send Push**
 
