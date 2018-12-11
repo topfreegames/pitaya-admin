@@ -26,19 +26,16 @@ type Request struct {
 }
 
 func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute string) (string, string, error) {
-
 	outputName := ""
 	inputName := ""
 
 	remoteMethodDocs, err := docs.GetMethodDoc(frontendtype, "remote", route, docsRemoteRoute, true)
-
 	if err != nil {
 		return "", "", err
 	}
 
 	in := remoteMethodDocs["input"]
 	inputDocs, ok := in.(map[string]interface{})
-
 	if !ok {
 		return "", "", constants.ErrNoInputDocForMethod
 	}
@@ -46,7 +43,6 @@ func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute stri
 	out := remoteMethodDocs["output"]
 	outputDocsArr := out.([]interface{})
 	outputDocs, ok := outputDocsArr[0].(map[string]interface{})
-
 	if !ok {
 		return "", "", constants.ErrNoOutputDocForMethod
 	}
@@ -68,7 +64,6 @@ func getInputAndOuputProtosFromAutodoc(route, frontendtype, docsRemoteRoute stri
 	}
 
 	return inputName, outputName, nil
-
 }
 
 func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProto, error) {
@@ -85,8 +80,7 @@ func unpackDescriptor(compressedDescriptor []byte) (*protobuf.FileDescriptorProt
 
 	fileDescriptorProto := new(protobuf.FileDescriptorProto)
 
-	err = proto.Unmarshal(b, fileDescriptorProto)
-	if err != nil {
+	if err = proto.Unmarshal(b, fileDescriptorProto); err != nil {
 		return nil, err
 	}
 
@@ -97,14 +91,11 @@ func retrieveDescriptor(protoName, protosRemoteRoute string) (*desc.FileDescript
 	replyMsg := &protos.ProtoDescriptor{}
 	protoRequest := &protos.ProtoName{Name: protoName}
 
-	err := pitaya.RPC(context.Background(), protosRemoteRoute, replyMsg, protoRequest)
-
-	if err != nil {
+	if err := pitaya.RPC(context.Background(), protosRemoteRoute, replyMsg, protoRequest); err != nil {
 		return nil, err
 	}
 
 	fileDescriptorProto, err := unpackDescriptor(replyMsg.Desc)
-
 	if err != nil {
 		return nil, err
 	}
@@ -114,14 +105,11 @@ func retrieveDescriptor(protoName, protosRemoteRoute string) (*desc.FileDescript
 	for _, dep := range fileDescriptorProto.GetDependency() {
 		replyMsgForDeps := &protos.ProtoDescriptor{}
 		protoRequestForDeps := &protos.ProtoName{Name: dep}
-		err = pitaya.RPC(context.Background(), protosRemoteRoute, replyMsgForDeps, protoRequestForDeps)
-
-		if err != nil {
+		if err = pitaya.RPC(context.Background(), protosRemoteRoute, replyMsgForDeps, protoRequestForDeps); err != nil {
 			return nil, err
 		}
 
 		depDescriptorProto, err := unpackDescriptor(replyMsgForDeps.Desc)
-
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +125,6 @@ func retrieveDescriptor(protoName, protosRemoteRoute string) (*desc.FileDescript
 		}
 
 		depDescriptor, err := desc.CreateFileDescriptor(depDescriptorProto, transitiveDepArr...)
-
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +139,6 @@ func retrieveDescriptor(protoName, protosRemoteRoute string) (*desc.FileDescript
 func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Message, error) {
 	rpcRoute := serverType + "." + protosRemoteRoute
 	fileDescriptor, err := retrieveDescriptor(protoName, rpcRoute)
-
 	if err != nil {
 		return nil, err
 	}
@@ -164,26 +150,21 @@ func buildMessage(serverType, protoName, protosRemoteRoute string) (*dynamic.Mes
 func CreateRPCMessagesFromProto(request Request, docsRemoteRoute, protosRemoteRoute string) (*dynamic.Message, *dynamic.Message, error) {
 
 	inputName, outputName, err := getInputAndOuputProtosFromAutodoc(request.Route, request.FrontendType, docsRemoteRoute)
-
 	if err != nil {
 		return nil, nil, err
 	}
 
 	requestMessage, err := buildMessage(request.FrontendType, inputName, protosRemoteRoute)
-
 	if err != nil {
 		return nil, nil, err
 	}
 
 	responseMessage, err := buildMessage(request.FrontendType, outputName, protosRemoteRoute)
-
 	if err != nil {
 		return nil, nil, err
 	}
 
-	err = requestMessage.UnmarshalJSON([]byte(request.Meta))
-
-	if err != nil {
+	if err = requestMessage.UnmarshalJSON([]byte(request.Meta)); err != nil {
 		return nil, nil, err
 	}
 

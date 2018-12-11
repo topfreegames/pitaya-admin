@@ -18,6 +18,14 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  digest = "1:b520b55fc1146c5b0eea03b07233f7a3d4a9be985c037c91ea6b82ecb81bd521"
+  name = "github.com/bitly/go-simplejson"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "aabad6e819789e569bd6aabf444c935aa9ba1e44"
+  version = "v0.5.0"
+
+[[projects]]
   digest = "1:5646e6da151d7d087a0de5790f2d543cf0a04bb1f565de2f4d9e53b24545c462"
   name = "github.com/coreos/etcd"
   packages = [
@@ -48,6 +56,17 @@
   pruneopts = "UT"
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
   version = "v1.4.7"
+
+[[projects]]
+  digest = "1:0594af97b2f4cec6554086eeace6597e20a4b69466eb4ada25adf9f4300dddd2"
+  name = "github.com/garyburd/redigo"
+  packages = [
+    "internal",
+    "redis",
+  ]
+  pruneopts = "UT"
+  revision = "a69d19351219b6dd56f274f96d85a7014a2ec34e"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:e1ff887e232b2d8f4f7c7db15a5fac7be418025afc4dda53c59c765dbb5aa6b4"
@@ -362,7 +381,15 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:d77643f66f77cc5f9d6986f0a3dadc100529565cebcbe4037e675823c91edbf9"
+  digest = "1:a35142e7dae983dc77f9822b754f1d9e41bfe9767d11585ab24dcd2ec871be0f"
+  name = "github.com/topfreegames/go-workers"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "debd68e29f6123083fb906c7a6352c748203538a"
+  version = "v0.0.1"
+
+[[projects]]
+  digest = "1:8e30d63c946a36655f49db99602a807cf5584c7f476926bf91b4798b5251a9ce"
   name = "github.com/topfreegames/pitaya"
   packages = [
     ".",
@@ -372,16 +399,17 @@
     "cluster",
     "component",
     "config",
+    "conn/codec",
+    "conn/message",
+    "conn/packet",
     "constants",
     "context",
     "defaultpipelines",
     "docgenerator",
     "errors",
     "examples/demo/protos",
+    "groups",
     "interfaces",
-    "internal/codec",
-    "internal/message",
-    "internal/packet",
     "logger",
     "metrics",
     "modules",
@@ -399,10 +427,19 @@
     "tracing",
     "util",
     "util/compression",
+    "worker",
   ]
   pruneopts = "UT"
-  revision = "08d1d52398eeeea7abfd636acbe3f333015fb46b"
-  version = "0.4.1"
+  revision = "118993bffd551c74c5cb81ac05c2b225d8807994"
+  version = "0.7.1"
+
+[[projects]]
+  digest = "1:a988307f0c4c8015c00cc122433879cf8eb4da05bd31b2f578795531a7815b13"
+  name = "github.com/topfreegames/viaproxy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "05f07d250022488417546d8056f49856b253c712"
+  version = "v0.1.2"
 
 [[projects]]
   branch = "master"

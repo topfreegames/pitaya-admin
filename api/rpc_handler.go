@@ -31,15 +31,12 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := json.NewDecoder(r.Body).Decode(&remote)
-
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&remote); err != nil {
 		WriteError(w, http.StatusBadRequest, "failed to decode request", err)
 		return
 	}
 
 	requestMessage, responseMessage, err := rpc.CreateRPCMessagesFromProto(remote, s.App.GetRemoteDocsRoute(), s.App.GetRemoteProtosRoute())
-
 	if err != nil {
 		WriteError(w, http.StatusBadRequest, "failed to create RPC", err)
 		return
@@ -52,7 +49,6 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			WriteError(w, http.StatusNotFound, "server not found", err)
 			return
 		}
-
 	} else {
 		err = pitaya.RPC(context.Background(), remote.Route, responseMessage, requestMessage)
 	}
@@ -63,7 +59,6 @@ func (s *RPCHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonResponse, err := responseMessage.MarshalJSON()
-
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to marshal response into JSON", err)
 		return

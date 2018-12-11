@@ -19,11 +19,10 @@
 vendor
 debug
 .vscode
+.vendor-new
 
 # vim temp files
 *.swp
 *.swo
 
-
 testing/server
-
