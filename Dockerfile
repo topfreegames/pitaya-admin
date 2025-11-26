@@ -1,15 +1,19 @@
-FROM golang:1.11-alpine AS build-env
+FROM golang:1.23-alpine AS build-env
 
 MAINTAINER TFG Co <backend@tfgco.com>
 
-RUN apk update && apk add git
-RUN go get -u github.com/golang/dep/cmd/dep
+RUN apk update && apk add git gcc musl-dev
 
-RUN mkdir -p /go/src/github.com/topfreegames/pitaya-admin
-ADD . /go/src/github.com/topfreegames/pitaya-admin
+WORKDIR /app
 
-WORKDIR /go/src/github.com/topfreegames/pitaya-admin
-RUN dep ensure
+# Copy go mod files first for better layer caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the application
 RUN go build -o main .
 
 FROM alpine:3.8
@@ -17,7 +21,7 @@ FROM alpine:3.8
 RUN apk update && apk add ca-certificates
 
 WORKDIR /app
-COPY --from=build-env /go/src/github.com/topfreegames/pitaya-admin/main /app
-COPY --from=build-env /go/src/github.com/topfreegames/pitaya-admin/config /app/config
+COPY --from=build-env /app/main /app
+COPY --from=build-env /app/config /app/config
 
 CMD ["./main", "start"]
